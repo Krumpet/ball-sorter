@@ -1,7 +1,7 @@
 import {
   Vial, Ball, GameState, Move,
-  CalculatedMove, GameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription
+  CalculatedMove, DFSGameStateNode,
+  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 
@@ -50,12 +50,16 @@ export function calculateMove(stateBefore: GameState, move: Move): CalculatedMov
   const movedBall = newState.vials.find(v => v.id === move.fromVial.id).balls.pop();
   movedBall.vialId = move.toVial.id;
   newState.vials.find(v => v.id === move.toVial.id).balls.push(movedBall);
-  newState.moveToHere = move;
+  // newState.moveToHere = move;
   return { ...move, stateAfter: newState };
 }
 
 export function stringifyVial(vial: Vial): string {
   return vial.balls.map(b => b.color).join('');
+}
+
+export function stringifyState(state: GameState): string {
+  return state.vials.map(v => stringifyVial(v)).sort().join('|');
 }
 
 export function stringifyMove(move: Move): string {
@@ -67,26 +71,40 @@ export function stringifyMove(move: Move): string {
  * sort vials by ball colors so states with similar vials in a different order are considered the same
  */
 export function areStatesEqual(one: GameState, two: GameState) {
-  const [firstVials, secondVials] = [one, two].map(state => state.vials.map(v => stringifyVial(v)).sort());
-  return firstVials.length === secondVials.length && firstVials.every((vialString, index) => vialString === secondVials[index]);
+  // const [firstVials, secondVials] = [one, two].map(state => state.vials.map(v => stringifyVial(v)).sort());
+  // return firstVials.length === secondVials.length && firstVials.every((vialString, index) => vialString === secondVials[index]);
+  const [first, second] = [one, two].map(stringifyState);
+  return one.vials.length === two.vials.length && first === second;
 }
 
-export function createNodeFromState(board: GameState): GameStateNode {
+export function createDFSNodeFromState(board: GameState): DFSGameStateNode {
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
-  const boardStateNode: GameStateNode = { ...board, possibleMoves };
+  const boardStateNode: DFSGameStateNode = { ...board, possibleMoves };
   return boardStateNode;
 }
+
+export function createBFSNodeFromState(board: GameState, movesToHere: Move[]): BFSGameStateNode {
+  const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
+    .map(move => calculateMove(board, move))
+    .map(move => ({ ...move, isBad: false }));
+  const boardStateNode: BFSGameStateNode = { ...board, possibleMoves, movesToHere };
+  return boardStateNode;
+}
+
+// export function createBFSNodeFromState(board:GameState, moves: Move[]): BFSGameStateNode {
+
+// }
 
 let next_id = 0;
 
 export function generateVial(list: VialDescription): Vial {
   const id = ++next_id;
-  return { balls: list === 'empty' ? [] : list.map(color => ({ color, vialId: id })), id };
+  return { balls: list.map(color => ({ color, vialId: id })), id };
 }
 
 export function generateBoard(params: GameDescription): GameState {
   const vials = params.map(list => generateVial(list));
-  return { vials, moveToHere: null };
+  return { vials, /*moveToHere: null*/ };
 }
