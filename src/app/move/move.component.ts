@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Move } from 'src/types';
-import { topBall } from 'src/functions';
+import { topBall, stringifyMove } from 'src/functions';
 import { BoardStateService } from '../board-state.service';
 
 @Component({
@@ -15,8 +15,7 @@ export class MoveComponent implements OnInit {
   constructor(private stateService: BoardStateService) { }
 
   ngOnInit() {
-    this.text = 'move ' + topBall(this.move.fromVial).color +
-      ' ball from vial ' + this.move.fromVial.id + ' to vial ' + this.move.toVial.id;
+    this.text = stringifyMove(this.move);
   }
 
   makeMove() {

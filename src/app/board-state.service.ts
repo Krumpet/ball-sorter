@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Vial, GameState, Move } from 'src/types';
-import { getPossibleMoves, isGameOver } from 'src/functions';
+import { getPossibleMoves, isGameOver, calculateMove, generateBoard } from 'src/functions';
+import { Levels } from 'src/levels';
 
 @Injectable({
   providedIn: 'root'
@@ -18,10 +19,10 @@ export class BoardStateService {
   get board() {
     return this._board;
   }
-  possibleMoves: Move[];
+  possibleMoves: Move[] = [];
 
   constructor() {
-    this.board = { vials: [new Vial(['red']), new Vial(['red', 'red', 'red'])], moveToHere: null };
+    this.board = generateBoard(Levels[1]);
   }
 
   public getPossibleMoves() {
@@ -29,10 +30,7 @@ export class BoardStateService {
   }
 
   makeMove(move: Move) {
-    const newState: GameState = JSON.parse(JSON.stringify(this.board));
-    const movedBall = newState.vials.find(v => v.id === move.fromVial.id).balls.pop();
-    newState.vials.find(v => v.id === move.toVial.id).balls.push(movedBall);
-    newState.moveToHere = move;
-    this.board = newState;
+    const calculatedMove = calculateMove(this.board, move);
+    this.board = calculatedMove.stateAfter;
   }
 }

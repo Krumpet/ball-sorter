@@ -6,6 +6,7 @@ import { BoardComponent } from './board/board.component';
 import { MoveComponent } from './move/move.component';
 import { MovesComponent } from './moves/moves.component';
 import { VialComponent } from './vial/vial.component';
+import { BallComponent } from './ball/ball.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { VialComponent } from './vial/vial.component';
     BoardComponent,
     MoveComponent,
     MovesComponent,
-    VialComponent
+    VialComponent,
+    BallComponent
   ],
   imports: [
     BrowserModule

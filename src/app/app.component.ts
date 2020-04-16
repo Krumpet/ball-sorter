@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { BoardStateService } from './board-state.service';
+import { SolverService } from './solver.service';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,10 @@ export class AppComponent {
   /**
    *
    */
-  constructor(public stateService: BoardStateService) {
+  constructor(public stateService: BoardStateService, private solverService: SolverService) {
+  }
+
+  solve() {
+    this.solverService.solve(this.stateService.board);
   }
 }

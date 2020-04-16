@@ -1,4 +1,6 @@
-<div class="vial" *ngFor="let color of display">
-  {{ color }}
+<div class="vial">
+  <div *ngFor="let color of display">
+    <app-ball [color]="color"></app-ball>
+  </div>
+  <span>Vial: {{ vial.id }}</span>
 </div>
-Vial: {{ vial.id }}
