@@ -22,13 +22,15 @@ export interface Vial {
   id: number;
 }
 
-export type VialDescription = BallColor[]; // | 'empty';
+export interface NotEmptyVial extends Vial { }
+
+export type VialDescription = BallColor[];
 
 export type GameDescription = VialDescription[];
 
 export interface GameState {
   vials: Vial[];
-  // moveToHere: null | Move;
+  
 }
 
 export interface GameStateNode extends GameState {
@@ -43,7 +45,7 @@ export interface BFSGameStateNode extends GameStateNode {
 
 export interface Move {
   stateBefore: GameState;
-  fromVial: Vial;
+  fromVial: NotEmptyVial;
   toVial: Vial;
 }
 

@@ -9,8 +9,8 @@ import { ballsPerVial } from 'src/consts';
 })
 export class VialComponent implements OnInit {
 
-  @Input() vial: Vial;
-  display: string[];
+  @Input() vial!: Vial;
+  display!: string[];
   constructor() { }
 
   ngOnInit() {

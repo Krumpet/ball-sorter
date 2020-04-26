@@ -7,13 +7,12 @@ import { getPossibleMoves, calculateMove, isGameOver, createDFSNodeFromState, ar
 })
 export class SolverService {
 
-  moveList: CalculatedMove[];
+  moveList!: CalculatedMove[];
 
   constructor() { }
 
-  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' = 'BFS') {
-    // const boardStateNode: DFSGameStateNode = createDFSNodeFromState(board);
-    let moves: Move[];
+  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' = 'BFS') {    
+    let moves: Move[] | null = null;
     switch (method) {
       case 'DFS':
         moves = this.solveRecursiveDFS(board);
@@ -43,16 +42,16 @@ export class SolverService {
     // TODO: sort moves using heuristic
     for (let index = 0; index < possibleGoodMoves.length; index++) {
       const candidate = possibleGoodMoves[index];
-      if (moveList.map(m => m.stateBefore).some(state => areStatesEqual(state, candidate.stateAfter))) {
-        const existingState = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter)).stateBefore;
+      const possibleMoveFromCandidateStateAfter = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter));
+      if (possibleMoveFromCandidateStateAfter) {
+        const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
         // loop detected
         console.log('loop', existingState, candidate, candidate.stateAfter);
         candidate.isBad = true;
         continue;
       }
       console.log('trying move ', candidate);
-      moveList.push(candidate);
-      // const newBoardStateNode = createDFSNodeFromState(candidate.stateAfter);
+      moveList.push(candidate);      
       const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1);
       if (!result) {
         moveList.pop();
@@ -77,7 +76,7 @@ export class SolverService {
     if (statesToExplore.length === 0) {
       return null;
     }
-    const nextStateToCheck = statesToExplore.shift();
+    const nextStateToCheck = <BFSGameStateNode>statesToExplore.shift();
     return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates)
   }
 
@@ -86,7 +85,7 @@ export class SolverService {
     const boardStateNode = createBFSNodeFromState(board, []);
     const statesToExplore: BFSGameStateNode[] = [boardStateNode];
     while (statesToExplore.length) {
-      const stateToExplore = statesToExplore.shift();
+      const stateToExplore = <BFSGameStateNode>statesToExplore.shift();
       if (isGameOver(stateToExplore)) {
         return stateToExplore.movesToHere;
       }

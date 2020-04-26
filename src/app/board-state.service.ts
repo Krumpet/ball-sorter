@@ -8,7 +8,7 @@ import { Levels } from 'src/levels';
 })
 export class BoardStateService {
   boardHistory: GameState[] = [];
-  _board: GameState;
+  _board!: GameState;
   isGameWon = false;
   set board(v: GameState) {
     this._board = v;

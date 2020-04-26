@@ -9,8 +9,8 @@ import { BoardStateService } from '../board-state.service';
   styleUrls: ['./move.component.css']
 })
 export class MoveComponent implements OnInit {
-  @Input() move: Move;
-  text: string;
+  @Input() move!: Move;
+  text!: string;
 
   constructor(private stateService: BoardStateService) { }
 

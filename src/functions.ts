@@ -1,12 +1,16 @@
 import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode
+  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 
-export function topBall(vial: Vial): Ball | null {
-  return isEmpty(vial) ? null : vial.balls[vial.balls.length - 1];
+export function topBall(vial: NotEmptyVial): Ball {
+  return vial.balls[vial.balls.length - 1];
+}
+
+export function hasBalls(vial: Vial): vial is NotEmptyVial {
+  return !isEmpty(vial);
 }
 
 export function isEmpty(vial: Vial): boolean {
@@ -33,33 +37,37 @@ export function getPossibleMoves(stateBefore: GameState): Move[] {
   if (isGameOver(stateBefore)) {
     return [];
   }
-  const sources = stateBefore.vials.filter(v => !isEmpty(v) && !isComplete(v));
+  const sources = stateBefore.vials.filter((vial: Vial): vial is NotEmptyVial => !isEmpty(vial) && !isComplete(vial));
 
   const moves: Move[][] = sources.map(fromVial => {
     const validTargets = stateBefore.vials.filter(possibleTarget => possibleTarget.id !== fromVial.id &&
       !isFull(possibleTarget) &&
-      (isEmpty(possibleTarget) || topBall(possibleTarget).color === topBall(fromVial).color));
+      (!hasBalls(possibleTarget) || topBall(possibleTarget).color === topBall(fromVial).color));
     return validTargets.map(toVial => ({ fromVial, toVial, stateBefore }));
   });
 
-  return [].concat.apply([], moves);
+  return ([] as Move[]).concat(...moves);
 }
 
 export function calculateMove(stateBefore: GameState, move: Move): CalculatedMove {
   const newState: GameState = JSON.parse(JSON.stringify(stateBefore));
-  const movedBall = newState.vials.find(v => v.id === move.fromVial.id).balls.pop();
+
+  const sourceVial = <NotEmptyVial>newState.vials.find(v => v.id === move.fromVial.id);
+  const targetVial = <Vial>newState.vials.find(v => v.id === move.toVial.id);
+  const movedBall = <Ball>sourceVial.balls.pop();  
+
   movedBall.vialId = move.toVial.id;
-  newState.vials.find(v => v.id === move.toVial.id).balls.push(movedBall);
-  // newState.moveToHere = move;
+  targetVial.balls.push(movedBall);
+
   return { ...move, stateAfter: newState };
 }
 
 export function stringifyVial(vial: Vial): string {
-  return vial.balls.map(b => b.color).join('');
+  return vial.balls.map(ball => ball.color).join('');
 }
 
 export function stringifyState(state: GameState): string {
-  return state.vials.map(v => stringifyVial(v)).sort().join('|');
+  return state.vials.map(stringifyVial).sort().join('|');
 }
 
 export function stringifyMove(move: Move): string {
@@ -71,8 +79,6 @@ export function stringifyMove(move: Move): string {
  * sort vials by ball colors so states with similar vials in a different order are considered the same
  */
 export function areStatesEqual(one: GameState, two: GameState) {
-  // const [firstVials, secondVials] = [one, two].map(state => state.vials.map(v => stringifyVial(v)).sort());
-  // return firstVials.length === secondVials.length && firstVials.every((vialString, index) => vialString === secondVials[index]);
   const [first, second] = [one, two].map(stringifyState);
   return one.vials.length === two.vials.length && first === second;
 }
@@ -93,10 +99,7 @@ export function createBFSNodeFromState(board: GameState, movesToHere: Move[]): B
   return boardStateNode;
 }
 
-// export function createBFSNodeFromState(board:GameState, moves: Move[]): BFSGameStateNode {
-
-// }
-
+// TODO: maintain this state in a service for editing levels
 let next_id = 0;
 
 export function generateVial(list: VialDescription): Vial {
@@ -106,5 +109,5 @@ export function generateVial(list: VialDescription): Vial {
 
 export function generateBoard(params: GameDescription): GameState {
   const vials = params.map(list => generateVial(list));
-  return { vials, /*moveToHere: null*/ };
+  return { vials };
 }

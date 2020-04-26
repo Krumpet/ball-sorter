@@ -8,8 +8,8 @@ import { BoardStateService } from '../board-state.service';
   styleUrls: ['./moves.component.css']
 })
 export class MovesComponent implements OnInit {
-  _state: GameState;
-  possibleMoves: Move[];
+  _state!: GameState;
+  possibleMoves!: Move[];
   @Input() set state(v: GameState) {
     this._state = v;
     this.possibleMoves = this.stateService.getPossibleMoves();

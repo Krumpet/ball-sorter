@@ -8,9 +8,11 @@ import { BallColor } from 'src/types';
 })
 export class BallComponent implements OnInit {
 
-  @Input() color: BallColor;
-  colorValue: string;
-  ballClass: { 'background-color': BallColor; };
+  @Input() color!: BallColor;
+  colorValue!: string;
+  ballClass!: {
+    'background-color': BallColor;
+  };
   constructor() { }
 
   ngOnInit() {
