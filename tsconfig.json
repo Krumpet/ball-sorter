@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "downlevelIteration": true,
     "strict": true,
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
@@ -10,7 +11,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "esnext",
+    "target": "es2015",
     "typeRoots": [
       "node_modules/@types"
     ],
