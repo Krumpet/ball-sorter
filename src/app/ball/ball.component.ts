@@ -1,9 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-<<<<<<< HEAD
 import { BallColor } from '../../types';
-=======
-import { BallColor } from 'src/types';
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 
 @Component({
   selector: 'app-ball',

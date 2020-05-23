@@ -1,16 +1,10 @@
 import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
-<<<<<<< HEAD
   CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 import { log } from 'util';
-=======
-  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial
-} from './types';
-import { ballsPerColor, ballsPerVial } from './consts';
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 
 export function topBall(vial: NotEmptyVial): Ball {
   return vial.balls[vial.balls.length - 1];
@@ -46,7 +40,6 @@ export function getPossibleMoves(stateBefore: GameState): Move[] {
   }
   const sources = stateBefore.vials.filter((vial: Vial): vial is NotEmptyVial => !isEmpty(vial) && !isComplete(vial));
 
-<<<<<<< HEAD
   // TODO: add moves into empty vials separately so there are less possible moves
   const moves: Move[][] = sources.map(fromVial => {
     const validTargets = stateBefore.vials.filter(possibleTarget => possibleTarget.id !== fromVial.id &&
@@ -57,12 +50,6 @@ export function getPossibleMoves(stateBefore: GameState): Move[] {
     if (!!possibleEmptyVialTarget) {
       validTargets.push(possibleEmptyVialTarget);
     }
-=======
-  const moves: Move[][] = sources.map(fromVial => {
-    const validTargets = stateBefore.vials.filter(possibleTarget => possibleTarget.id !== fromVial.id &&
-      !isFull(possibleTarget) &&
-      (!hasBalls(possibleTarget) || topBall(possibleTarget).color === topBall(fromVial).color));
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
     return validTargets.map(toVial => ({ fromVial, toVial, stateBefore }));
   });
 
@@ -74,11 +61,7 @@ export function calculateMove(stateBefore: GameState, move: Move): CalculatedMov
 
   const sourceVial = <NotEmptyVial>newState.vials.find(v => v.id === move.fromVial.id);
   const targetVial = <Vial>newState.vials.find(v => v.id === move.toVial.id);
-<<<<<<< HEAD
   const movedBall = <Ball>sourceVial.balls.pop();
-=======
-  const movedBall = <Ball>sourceVial.balls.pop();  
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 
   movedBall.vialId = move.toVial.id;
   targetVial.balls.push(movedBall);
@@ -115,11 +98,7 @@ export function createDFSNodeFromState(board: GameState): DFSGameStateNode {
   return boardStateNode;
 }
 
-<<<<<<< HEAD
 export function createBFSNodeFromState(board: GameState, movesToHere: Move[] = []): BFSGameStateNode {
-=======
-export function createBFSNodeFromState(board: GameState, movesToHere: Move[]): BFSGameStateNode {
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
@@ -139,7 +118,6 @@ export function generateBoard(params: GameDescription): GameState {
   const vials = params.map(list => generateVial(list));
   return { vials };
 }
-<<<<<<< HEAD
 
 export function CountArrayItemsByFunction<T extends string, U>(array: U[], splitter: (item: U) => T): Partial<{ [k in T]: number }> {
   const returnValue: Partial<{ [k in T]: number }> = {};
@@ -195,5 +173,3 @@ export function colorsInState(state: GameState): BallColor[] {
 export function distinct<T>(item: T, index: number, array: T[]) {
   return array.indexOf(item) === index;
 }
-=======
->>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
