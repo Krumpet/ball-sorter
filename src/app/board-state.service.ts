@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
+<<<<<<< HEAD
 import { GameState, Move } from '../types';
 import { getPossibleMoves, isGameOver, calculateMove, generateBoard } from '../functions';
 import { Levels } from '../levels';
+=======
+import { Vial, GameState, Move } from 'src/types';
+import { getPossibleMoves, isGameOver, calculateMove, generateBoard } from 'src/functions';
+import { Levels } from 'src/levels';
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 
 @Injectable({
   providedIn: 'root'

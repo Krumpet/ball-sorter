@@ -130,8 +130,12 @@
       }
     }
   },
+<<<<<<< HEAD
   "defaultProject": "ball-sorter",
   "cli": {
     "analytics": "cc98c9ec-fce6-4a40-916e-bd2dc93bf19b"
   }
+=======
+  "defaultProject": "ball-sorter"
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 }

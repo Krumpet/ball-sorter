@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
+<<<<<<< HEAD
 import { CalculatedMove, GameState, Move, BFSGameStateNode } from '../types';
 import { createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState } from '../functions';
+=======
+import { GameState, CalculatedMove, CalculatedMoveForSolver, DFSGameStateNode, Move, BFSGameStateNode } from 'src/types';
+import { getPossibleMoves, calculateMove, isGameOver, createDFSNodeFromState, areStatesEqual, stringifyMove, stringifyState, createBFSNodeFromState } from 'src/functions';
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +16,22 @@ export class SolverService {
 
   constructor() { }
 
+<<<<<<< HEAD
   solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' = 'BFS') {
+=======
+  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' = 'BFS') {    
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
     let moves: Move[] | null = null;
     switch (method) {
       case 'DFS':
         moves = this.solveRecursiveDFS(board);
         break;
       case 'BFS-Recursive':
+<<<<<<< HEAD
         moves = this.solveRecursiveBFS(createBFSNodeFromState(board));
+=======
+        moves = this.solveRecursiveBFS(createBFSNodeFromState(board, []));
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
         break;
       case 'BFS':
         moves = this.solveBFS(board);
@@ -51,7 +64,11 @@ export class SolverService {
         continue;
       }
       console.log('trying move ', candidate);
+<<<<<<< HEAD
       moveList.push(candidate);
+=======
+      moveList.push(candidate);      
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
       const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1);
       if (!result) {
         moveList.pop();
@@ -77,6 +94,7 @@ export class SolverService {
       return null;
     }
     const nextStateToCheck = <BFSGameStateNode>statesToExplore.shift();
+<<<<<<< HEAD
     return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates);
   }
 
@@ -100,10 +118,23 @@ export class SolverService {
         performance.clearMarks();
         performance.clearMeasures();
 
+=======
+    return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates)
+  }
+
+  solveBFS(board: GameState): Move[] | null {
+    const exploredStates = new Set<string>([stringifyState(board)]);
+    const boardStateNode = createBFSNodeFromState(board, []);
+    const statesToExplore: BFSGameStateNode[] = [boardStateNode];
+    while (statesToExplore.length) {
+      const stateToExplore = <BFSGameStateNode>statesToExplore.shift();
+      if (isGameOver(stateToExplore)) {
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
         return stateToExplore.movesToHere;
       }
       this.updateNewStates(stateToExplore, exploredStates, statesToExplore);
     }
+<<<<<<< HEAD
     performance.mark(end);
     performance.measure('BFS total time', start, end);
     console.log('BFS took ' + performance.getEntriesByName('BFS total time')[0].duration + ' ms');
@@ -111,6 +142,8 @@ export class SolverService {
 
     performance.clearMarks();
     performance.clearMeasures();
+=======
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
     return null;
   }
 

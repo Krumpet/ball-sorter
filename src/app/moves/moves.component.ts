@@ -1,5 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
+<<<<<<< HEAD
 import { GameState, Move } from '../../types';
+=======
+import { GameState, Move } from 'src/types';
+>>>>>>> eaecc45c10bdc56c6a512efc90710cf2b1f21ff4
 import { BoardStateService } from '../board-state.service';
 
 @Component({
