@@ -10,10 +10,10 @@ export class BoardStateService {
   boardHistory: GameState[] = [];
   _board!: GameState;
   isGameWon = false;
-  set board(v: GameState) {
-    this._board = v;
+  set board(newState: GameState) {
+    this._board = newState;
     this.possibleMoves = getPossibleMoves(this._board);
-    this.boardHistory.push(this._board);
+    this.boardHistory.push(this._board); // TODO: option to reset when switching levels
     this.isGameWon = isGameOver(this._board);
   }
   get board() {

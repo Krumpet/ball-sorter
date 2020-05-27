@@ -269,6 +269,10 @@ export default abstract class Heap<T> {
     }
   }
 
+  size(): number {
+    return this.heapContainer.length;
+  }
+
   /**
    * Checks if pair of heap elements is in correct order.
    * For MinHeap the first element must be always smaller or equal.
@@ -277,6 +281,6 @@ export default abstract class Heap<T> {
    * @param {*} firstElement
    * @param {*} secondElement
    * @return {boolean}
-   */  
+   */
   abstract pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
 }

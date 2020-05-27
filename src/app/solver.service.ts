@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode } from '../types';
-import { createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState } from '../functions';
+import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode } from '../types';
+import {
+  createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
+  createAStarNodeFromState, getPath, calculateEntropyForState
+} from '../functions';
+import PriorityQueue from '../assets/data structures/PriorityQueue';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +15,7 @@ export class SolverService {
 
   constructor() { }
 
-  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' = 'BFS') {
+  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'AStar' = 'AStar') {
     let moves: Move[] | null = null;
     switch (method) {
       case 'DFS':
@@ -22,15 +26,28 @@ export class SolverService {
         break;
       case 'BFS':
         moves = this.solveBFS(board);
+        break;
+      case 'AStar':
+        moves = this.solveAStar(board, {
+          heuristic: (a) => calculateEntropyForState(a),
+          heuristicScale: 1.0, costFunction: (a) => 0, costScale: 0
+        });
+        break;
     }
     console.log(moves ? moves.map(stringifyMove) : 'no solution!');
+    // this is done to check if a greedy best-first search algorithm would work, but we don't always choose the state with lowest entropy:
+    // moves.map(move => move.stateBefore).forEach(state => {
+    //   const stateEntropy = calculateEntropyForState(state);
+    //   const possibleMovesFromHere = createBFSNodeFromState(state).possibleMoves;
+    //   const possibleStatesFromHere = possibleMovesFromHere.map(move => move.stateAfter);
+    //   const possibleEntropiesFromHere = possibleStatesFromHere.map(calculateEntropyForState);
+    //   console.log(`${possibleMovesFromHere.length} possible moves,
+    //    state entropy is ${stateEntropy},
+    //    lowest entropy after a move is ${Math.min(...possibleEntropiesFromHere)}`);
+    // });
   }
 
   solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0): Move[] | null {
-    // if (depth > 10) {
-    //   console.log('too deep');
-    //   return null;
-    // }
     const boardStateNode = createDFSNodeFromState(board);
     if (isGameOver(boardStateNode)) {
       return moveList;
@@ -111,6 +128,50 @@ export class SolverService {
 
     performance.clearMarks();
     performance.clearMeasures();
+    return null;
+  }
+
+  solveAStar(state: GameState, config: AStarConfig) {
+    const stateNode: AStarStateNode = createAStarNodeFromState(state, config);
+    // const openSet = new MinHeap<AStarStateNode>((a, b) => a.score < b.score ? -1 : a.score > b.score ? 1 : 0);
+    const openSet = new PriorityQueue<AStarStateNode>(
+      (a, b) => a.score < b.score ? -1 : a.score > b.score ? 1 : 0,
+      (a, b) => a.stringState === b.stringState ? 0 : -1 // is acutally only equality comparator
+    );
+    const gScores: { [k: string]: number } = {};
+    // const hScores: { [k: string]: number } = {};
+    // const closedNodes: { [k: string]: AStarStateNode } = {};
+    const parents: { [k: string]: AStarStateNode } = { [stateNode.stringState]: null };
+
+    openSet.add(stateNode, stateNode.score);
+
+    while (openSet.size() > 0) {
+      let current = openSet.poll();
+      if (isGameOver(current.stateNode)) {
+        return getPath(current, parents);
+      }
+
+      // closedNodes[current.stringState] = current;
+
+      const possibleNextStates = current.stateNode.possibleMoves
+        .map(move => ({ move, after: move.stateAfter })) // todo: avoid calculating heuristics again
+        .map(({ move, after }) => createAStarNodeFromState(after, config, [...current.stateNode.movesToHere, move]));
+
+      possibleNextStates.forEach(neighbor => {
+        // improved score for a state?
+        if (gScores[neighbor.stringState] == undefined || neighbor.distance < gScores[neighbor.stringState]) { // comparing to undefined in case of score 0
+          parents[neighbor.stringState] = current;
+          gScores[neighbor.stringState] = neighbor.distance;
+          // if (!!closedNodes[neighbor.stringState]) {
+          //   delete closedNodes[neighbor.stringState];
+          // }
+          if (!openSet.findByValue(neighbor).length) { // compares using stringState
+            openSet.add(neighbor, neighbor.score);
+          }
+        }
+
+      });
+    }
     return null;
   }
 

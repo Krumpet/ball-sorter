@@ -6,8 +6,9 @@ import Comparator from './Comparator';
 export default class PriorityQueue<T> extends MinHeap<T> {
   priorities: Map<T, number>;
   compare: Comparator<T>;
+  compareValue: Comparator<T>;
 
-  constructor(compareFunc: (a: T, b: T) => 0 | 1 | -1) {
+  constructor(compareFunc: (a: T, b: T) => 0 | 1 | -1, compareValueFunc: (a: T, b: T) => 0 | 1 | -1) {
     // Call MinHip constructor first.
     super(compareFunc);
 
@@ -17,6 +18,7 @@ export default class PriorityQueue<T> extends MinHeap<T> {
     // Use custom comparator for heap elements that will take element priority
     // instead of element value into account.
     this.compare = new Comparator(this.comparePriority.bind(this));
+    this.compareValue = new Comparator(compareValueFunc);
   }
 
   /**
@@ -50,9 +52,15 @@ export default class PriorityQueue<T> extends MinHeap<T> {
    * @return {PriorityQueue}
    */
   changePriority(item: T, priority: number): PriorityQueue<T> {
-    this.remove(item, new Comparator(this.compareValue));
+    this.remove(item, this.compareValue);
     this.add(item, priority);
     return this;
+  }
+
+  poll() {
+    const result = super.poll();
+    this.priorities.delete(result);
+    return result;
   }
 
   /**
@@ -61,7 +69,7 @@ export default class PriorityQueue<T> extends MinHeap<T> {
    * @return {Number[]}
    */
   findByValue(item: T): number[] {
-    return this.find(item, new Comparator(this.compareValue));
+    return this.find(item, this.compareValue);
   }
 
   /**
@@ -92,10 +100,10 @@ export default class PriorityQueue<T> extends MinHeap<T> {
    * @param {*} b
    * @return {-1|0|1}
    */
-  compareValue(a: T, b: T): -1 | 0 | 1 {
-    if (a === b) {
-      return 0;
-    }
-    return a < b ? -1 : 1;
-  }
+  // compareValue(a: T, b: T): -1 | 0 | 1 {
+  //   if (a === b) {
+  //     return 0;
+  //   }
+  //   return a < b ? -1 : 1;
+  // }
 }

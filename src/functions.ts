@@ -1,7 +1,7 @@
 import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor
+  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 import { log } from 'util';
@@ -106,6 +106,32 @@ export function createBFSNodeFromState(board: GameState, movesToHere: Move[] = [
   return boardStateNode;
 }
 
+export function createAStarNodeFromState(board: GameState, config: AStarConfig, movesToHere: Move[] = []): AStarStateNode {
+  const stateNode = createBFSNodeFromState(board, movesToHere);
+  const heuristic = config.heuristic(stateNode) * config.heuristicScale; // TODO: check if optional
+  const distance = config.costFunction(stateNode) * config.costScale;
+  return {
+    stateNode,
+    heuristic,
+    distance,
+    score: heuristic + distance,
+    closed: false,
+    parent: null, // TODO: maybe this is set here?
+    moveToHere: movesToHere.length ? movesToHere[movesToHere.length - 1] : null,
+    stringState: stringifyState(stateNode)
+  };
+}
+
+export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {
+  let curr = state;
+  const path = [curr.moveToHere];
+  while (parents[curr.stringState]) {
+    path.unshift(parents[curr.stringState].moveToHere);
+    curr = parents[curr.stringState];
+  }
+  return path.filter(move => !!move);
+}
+
 // TODO: maintain this state in a service for editing levels
 let next_id = 0;
 
@@ -132,6 +158,11 @@ export function CountArrayItemsByFunction<T extends string, U>(array: U[], split
   return returnValue;
 }
 
+export function sumArray(array: number[]): number {
+  // initial value to handle empty arrays
+  return array.reduce((sum, current) => sum + current, 0);
+}
+
 export function groupBallsByColor(vial: Vial) {
   return CountArrayItemsByFunction(vial.balls, (ball) => ball.color);
 }
@@ -142,23 +173,26 @@ export function entropyOfVial(vial: Vial) {
     return 0;
   }
   const ballsGroupedByColor = groupBallsByColor(vial);
-  const vialEntropy = Object.values(ballsGroupedByColor)
-    .map(num => {
-      if (num === 0) { return 0; } // probability is zero, avoid calculating 0 * -infinity
-      const probability = num / ballsNumber;
-      return -probability * Math.log(probability);
-    })
-    .reduce((prev, current) => prev + current); // sum color entropies
+  const vialEntropy = sumArray(
+    Object.values(ballsGroupedByColor)
+      .map(num => {
+        if (num === 0) { return 0; } // probability is zero, avoid calculating 0 * -infinity
+        const probability = num / ballsNumber;
+        return -probability * Math.log(probability);
+      })
+  ); // sum color entropies
   return vialEntropy;
 }
 
 export function calculateEntropyForState(state: GameState): number {
-  const totalBalls = state.vials
-    .map(vial => vial.balls.length)
-    .reduce((prev, current) => prev + current);
-  const stateEntropy = state.vials
-    .map(vial => vial.balls.length * entropyOfVial(vial) / totalBalls)
-    .reduce((prev, current) => prev + current);
+  const totalBalls = sumArray(
+    state.vials.map(vial => vial.balls.length)
+  );
+  const stateEntropy = sumArray(
+    state.vials
+      .filter(vial => !isEmpty(vial))
+      .map(vial => vial.balls.length * entropyOfVial(vial) / totalBalls)
+  ); // sum vial entropies
   return stateEntropy;
 }
 
