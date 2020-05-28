@@ -102,9 +102,6 @@ export default abstract class Heap<T> {
     this.heapContainer[indexOne] = tmp;
   }
 
-  /**
-   * @return {*}
-   */
   peek(): T {
     if (this.heapContainer.length === 0) {
       return null;
@@ -113,9 +110,6 @@ export default abstract class Heap<T> {
     return this.heapContainer[0];
   }
 
-  /**
-   * @return {*}
-   */
   poll(): T {
     if (this.heapContainer.length === 0) {
       return null;
@@ -134,21 +128,12 @@ export default abstract class Heap<T> {
     return item;
   }
 
-  /**
-   * @param {*} item
-   * @return {Heap}
-   */
   add(item: T): Heap<T> {
     this.heapContainer.push(item);
     this.heapifyUp();
     return this;
   }
 
-  /**
-   * @param {*} item
-   * @param {Comparator} [comparator]
-   * @return {Heap}
-   */
   remove(item: T, comparator: Comparator<T> = this.compare): Heap<T> {
     // Find number of items to remove.
     const numberOfItemsToRemove = this.find(item, comparator).length;
@@ -188,11 +173,6 @@ export default abstract class Heap<T> {
     return this;
   }
 
-  /**
-   * @param {*} item
-   * @param {Comparator} [comparator]
-   * @return {Number[]}
-   */
   find(item: T, comparator: Comparator<T> = this.compare): number[] {
     const foundItemIndices = [];
 
@@ -205,27 +185,20 @@ export default abstract class Heap<T> {
     return foundItemIndices;
   }
 
-  /**
-   * @return {boolean}
-   */
   isEmpty(): boolean {
     return !this.heapContainer.length;
   }
 
-  /**
-   * @return {string}
-   */
   toString(): string {
     return this.heapContainer.toString();
   }
 
   /**
-   * @param {number} [customStartIndex]
+   * Take the last element (last in array or the bottom left in a tree)
+   * in the heap container and lift it up until it is in the correct
+   * order with respect to its parent element.
    */
   heapifyUp(customStartIndex?: number) {
-    // Take the last element (last in array or the bottom left in a tree)
-    // in the heap container and lift it up until it is in the correct
-    // order with respect to its parent element.
     let currentIndex = customStartIndex || this.heapContainer.length - 1;
 
     while (
@@ -237,13 +210,12 @@ export default abstract class Heap<T> {
     }
   }
 
-  /**
-   * @param {number} [customStartIndex]
+  /** Compare the parent element to its children and swap parent with the appropriate
+   * child (smallest child for MinHeap, largest child for MaxHeap).
+   * Do the same for next children after swap.
    */
   heapifyDown(customStartIndex: number = 0) {
-    // Compare the parent element to its children and swap parent with the appropriate
-    // child (smallest child for MinHeap, largest child for MaxHeap).
-    // Do the same for next children after swap.
+
     let currentIndex = customStartIndex;
     let nextIndex = null;
 
@@ -277,10 +249,6 @@ export default abstract class Heap<T> {
    * Checks if pair of heap elements is in correct order.
    * For MinHeap the first element must be always smaller or equal.
    * For MaxHeap the first element must be always bigger or equal.
-   *
-   * @param {*} firstElement
-   * @param {*} secondElement
-   * @return {boolean}
    */
   abstract pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
 }
