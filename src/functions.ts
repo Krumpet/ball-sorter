@@ -40,7 +40,7 @@ export function getPossibleMoves(stateBefore: GameState): Move[] {
   }
   const sources = stateBefore.vials.filter((vial: Vial): vial is NotEmptyVial => !isEmpty(vial) && !isComplete(vial));
 
-  // TODO: add moves into empty vials separately so there are less possible moves
+  // TODO: calculate moves as moving all balls of the same color together
   const moves: Move[][] = sources.map(fromVial => {
     const validTargets = stateBefore.vials.filter(possibleTarget => possibleTarget.id !== fromVial.id &&
       !isFull(possibleTarget) &&
@@ -160,6 +160,38 @@ export function calculateEntropyForState(state: GameState): number {
     .map(vial => vial.balls.length * entropyOfVial(vial) / totalBalls)
     .reduce((prev, current) => prev + current);
   return stateEntropy;
+}
+
+export function calculateDistanceHeuristicForState(state: GameState): number {
+  type baseColorDictionaryType = Partial<{ [c in BallColor]: { index: number; amount: number } }>;
+
+  const baseVialMap: baseColorDictionaryType =
+    state.vials.filter(vial => !isEmpty(vial)).reduce((dictionary, vial, index) => {
+      const baseColor = vial.balls[0].color;
+      let amountOfThatColor = 0;
+      for (let index = 0; index < vial.balls.length; index++) {
+        if (vial.balls[index].color === baseColor) {
+          amountOfThatColor++;
+        } else break; // stop counting once we hit the first off-color ball        
+      }
+      if (!(baseColor in dictionary) || dictionary[baseColor].amount < amountOfThatColor) {
+        // TODO: how to handle equality in amount?
+        dictionary[baseColor] = { index, amount: amountOfThatColor };
+      }
+      return dictionary;
+    }, {} as baseColorDictionaryType);
+
+  // TODO: this could be changed to count all of the balls not directly on top of their base color,
+  // e.g. (bottom -> purple purple grey purple -> top) would count the top purple as misplaced
+  let result = 0;
+  state.vials.filter(vial => !isEmpty(vial)).forEach((vial, index) => {
+    vial.balls.forEach(ball => {
+      if (baseVialMap[ball.color].index !== index) {
+        result++;
+      }
+    });
+  });
+  return result;
 }
 
 export function colorsInVial(vial: Vial): BallColor[] {
