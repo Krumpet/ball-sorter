@@ -1,10 +1,10 @@
 import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState
+  CalculatedMoveForSolver, GameDescription, VialDescription,
+  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
-import { log } from 'util';
 
 export function topBall(vial: NotEmptyVial): Ball {
   return vial.balls[vial.balls.length - 1];
@@ -130,7 +130,7 @@ export function createAStarNodeFromState(board: GameState,
   };
 }
 
-export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {  
+export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {
   // let curr = state;
   // const path = [curr.moveToHere];
   // while (parents[curr.stringState]) {
@@ -212,10 +212,10 @@ export function calculateDistanceHeuristicForState(state: GameState): number {
     state.vials.filter(vial => !isEmpty(vial)).reduce((dictionary, vial, index) => {
       const baseColor = vial.balls[0].color;
       let amountOfThatColor = 0;
-      for (let index = 0; index < vial.balls.length; index++) {
-        if (vial.balls[index].color === baseColor) {
+      for (let ballIndex = 0; ballIndex < vial.balls.length; ballIndex++) {
+        if (vial.balls[ballIndex].color === baseColor) {
           amountOfThatColor++;
-        } else break; // stop counting once we hit the first off-color ball        
+        } else { break; } // stop counting once we hit the first off-color ball
       }
       if (!(baseColor in dictionary) || dictionary[baseColor].amount < amountOfThatColor) {
         // TODO: how to handle equality in amount?
