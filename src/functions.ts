@@ -1,7 +1,7 @@
 import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig
+  CalculatedMoveForSolver, GameDescription, VialDescription, BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 import { log } from 'util';
@@ -73,7 +73,7 @@ export function stringifyVial(vial: Vial): string {
   return vial.balls.map(ball => ball.color).join('');
 }
 
-export function stringifyState(state: GameState): string {
+export function stringifyState(state: GameState): StringState {
   return state.vials.map(stringifyVial).sort().join('|');
 }
 
@@ -106,30 +106,39 @@ export function createBFSNodeFromState(board: GameState, movesToHere: Move[] = [
   return boardStateNode;
 }
 
-export function createAStarNodeFromState(board: GameState, config: AStarConfig, movesToHere: Move[] = []): AStarStateNode {
+export function createAStarNodeFromState(board: GameState,
+  heuristics: { [k in StringState]: number },
+  config: AStarConfig,
+  movesToHere: Move[] = []): AStarStateNode {
   const stateNode = createBFSNodeFromState(board, movesToHere);
-  const heuristic = config.heuristic(stateNode) * config.heuristicScale; // TODO: check if optional
+  const stringState = stringifyState(stateNode);
+  let heuristic = 0;
+  if (stringState in heuristics) {
+    heuristic = heuristics[stringState];
+  } else {
+    heuristic = config.heuristic(stateNode) * config.heuristicScale; // TODO: check if optional
+    heuristics[stringState] = heuristic;
+  }
   const distance = config.costFunction(stateNode) * config.costScale;
   return {
     stateNode,
     heuristic,
     distance,
     score: heuristic + distance,
-    closed: false,
-    parent: null, // TODO: maybe this is set here?
     moveToHere: movesToHere.length ? movesToHere[movesToHere.length - 1] : null,
-    stringState: stringifyState(stateNode)
+    stringState: stringState
   };
 }
 
-export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {
-  let curr = state;
-  const path = [curr.moveToHere];
-  while (parents[curr.stringState]) {
-    path.unshift(parents[curr.stringState].moveToHere);
-    curr = parents[curr.stringState];
-  }
-  return path.filter(move => !!move);
+export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {  
+  // let curr = state;
+  // const path = [curr.moveToHere];
+  // while (parents[curr.stringState]) {
+  //   path.unshift(parents[curr.stringState].moveToHere);
+  //   curr = parents[curr.stringState];
+  // }
+  // return path.filter(move => !!move);
+  return state.stateNode.movesToHere;
 }
 
 // TODO: maintain this state in a service for editing levels
@@ -220,7 +229,7 @@ export function calculateDistanceHeuristicForState(state: GameState): number {
   let result = 0;
   state.vials.filter(vial => !isEmpty(vial)).forEach((vial, index) => {
     vial.balls.forEach(ball => {
-      if (baseVialMap[ball.color].index !== index) {
+      if (!(ball.color in baseVialMap) || baseVialMap[ball.color].index !== index) {
         result++;
       }
     });

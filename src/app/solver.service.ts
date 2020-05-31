@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode } from '../types';
+import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState } from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
-  createAStarNodeFromState, getPath, calculateEntropyForState
+  createAStarNodeFromState, getPath, calculateEntropyForState, calculateDistanceHeuristicForState
 } from '../functions';
 import PriorityQueue from '../assets/data structures/PriorityQueue';
 
@@ -25,12 +25,14 @@ export class SolverService {
         moves = this.solveRecursiveBFS(createBFSNodeFromState(board));
         break;
       case 'BFS':
-        moves = this.solveBFS(board);
+        moves = this.solveBFS(board).moves;
         break;
       case 'AStar':
-        moves = this.solveAStar(board, {
+        moves = this.solveWithPerformance(method, this.solveAStar, board, {
           heuristic: (a) => calculateEntropyForState(a),
-          heuristicScale: 1.0, costFunction: (a) => 0, costScale: 0
+          heuristicScale: 35.0,
+          costFunction: (a) => a.movesToHere.length,
+          costScale: 1.0
         });
         break;
     }
@@ -45,6 +47,18 @@ export class SolverService {
     //    state entropy is ${stateEntropy},
     //    lowest entropy after a move is ${Math.min(...possibleEntropiesFromHere)}`);
     // });
+  }
+
+  solveWithPerformance<In extends unknown[], Out>(name: string, func: (...args: In) => Out, ...args: In): Out {
+    const start = 'start' + name, end = 'end' + name;
+    performance.mark(start);
+    const result = func(...args);
+    performance.mark(end);
+    performance.measure(name, start, end);
+    console.log(name + ' took ' + performance.getEntriesByName(name)[0].duration + ' ms');
+    performance.clearMarks();
+    performance.clearMeasures();
+    return result;
   }
 
   solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0): Move[] | null {
@@ -97,7 +111,7 @@ export class SolverService {
     return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates);
   }
 
-  solveBFS(board: GameState): Move[] | null {
+  solveBFS(board: GameState): { moves: Move[] | null, nodeStats: { opened: number, totalUnique: number } } {
     const start = 'startBFS', end = 'endBFS';
     performance.mark(start);
     let exploredStatesNumber = 0;
@@ -117,7 +131,7 @@ export class SolverService {
         performance.clearMarks();
         performance.clearMeasures();
 
-        return stateToExplore.movesToHere;
+        return { moves: stateToExplore.movesToHere, nodeStats: { totalUnique: exploredStatesNumber, opened: exploredStatesNumber } };
       }
       this.updateNewStates(stateToExplore, exploredStates, statesToExplore);
     }
@@ -132,44 +146,40 @@ export class SolverService {
   }
 
   solveAStar(state: GameState, config: AStarConfig) {
-    const stateNode: AStarStateNode = createAStarNodeFromState(state, config);
-    // const openSet = new MinHeap<AStarStateNode>((a, b) => a.score < b.score ? -1 : a.score > b.score ? 1 : 0);
+
+    const heuristics: { [k in StringState]: number } = {};
+    const stateNode: AStarStateNode = createAStarNodeFromState(state, heuristics, config);
+    const gScores: { [k in StringState]: number } = { [stateNode.stringState]: stateNode.distance };
+    const parents: { [k in StringState]: AStarStateNode } = { [stateNode.stringState]: null };
     const openSet = new PriorityQueue<AStarStateNode>(
       (a, b) => a.score < b.score ? -1 : a.score > b.score ? 1 : 0,
-      (a, b) => a.stringState === b.stringState ? 0 : -1 // is acutally only equality comparator
+      (a, b) => a.stringState === b.stringState ? 0 : -1 // is actually only equality comparator
     );
-    const gScores: { [k: string]: number } = {};
-    // const hScores: { [k: string]: number } = {};
-    // const closedNodes: { [k: string]: AStarStateNode } = {};
-    const parents: { [k: string]: AStarStateNode } = { [stateNode.stringState]: null };
 
     openSet.add(stateNode, stateNode.score);
 
     while (openSet.size() > 0) {
-      let current = openSet.poll();
+      const current = openSet.poll();
       if (isGameOver(current.stateNode)) {
         return getPath(current, parents);
       }
 
-      // closedNodes[current.stringState] = current;
-
       const possibleNextStates = current.stateNode.possibleMoves
-        .map(move => ({ move, after: move.stateAfter })) // todo: avoid calculating heuristics again
-        .map(({ move, after }) => createAStarNodeFromState(after, config, [...current.stateNode.movesToHere, move]));
+        .map(move => ({ move, after: move.stateAfter }))
+        .map(({ move, after }) => createAStarNodeFromState(after, heuristics, config, [...current.stateNode.movesToHere, move]));
 
       possibleNextStates.forEach(neighbor => {
         // improved score for a state?
-        if (gScores[neighbor.stringState] == undefined || neighbor.distance < gScores[neighbor.stringState]) { // comparing to undefined in case of score 0
-          parents[neighbor.stringState] = current;
+        if (!(neighbor.stringState in gScores) || neighbor.distance < gScores[neighbor.stringState]) {
+          // parents[neighbor.stringState] = current; // TODO: do I need to maintain parents or is "moves to here" good enough?
           gScores[neighbor.stringState] = neighbor.distance;
-          // if (!!closedNodes[neighbor.stringState]) {
-          //   delete closedNodes[neighbor.stringState];
-          // }
-          if (!openSet.findByValue(neighbor).length) { // compares using stringState
-            openSet.add(neighbor, neighbor.score);
+          const existingNodeIndicesInOpenSet = openSet.findByValue(neighbor);
+          if (existingNodeIndicesInOpenSet.length) {
+            if (existingNodeIndicesInOpenSet.length > 1) { console.log('more than one!'); }
+            openSet.removeMatching(neighbor);
           }
+          openSet.add(neighbor, neighbor.score);
         }
-
       });
     }
     return null;

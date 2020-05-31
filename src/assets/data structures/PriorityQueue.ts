@@ -45,6 +45,31 @@ export default class PriorityQueue<T> extends MinHeap<T> {
     return this;
   }
 
+  removeMatching(item: T, customFindingComparator = this.compareValue): PriorityQueue<T> {
+    super.remove(item, customFindingComparator);
+    let entryToRemove: T;
+    for (const entry of this.priorities) {
+      if (customFindingComparator.equal(entry[0], item)) {
+        entryToRemove = entry[0];
+        break;
+      }
+    }
+    this.priorities.delete(entryToRemove);
+    return this;
+  }
+
+  // removeAtIndices(indices: number[]): void {
+  //   if (indices.length === 0) { return; }
+  //   if (indices.length === 1) {
+  //     const item = this.heapContainer.find((_item, index) => index === indices[0]);
+  //     this.remove(item);
+  //     return;
+  //   } else {
+  //     const items = this.heapContainer.filter((_item, index) => indices.includes(index));
+  //     items.forEach(item => this.remove(item));
+  //   }
+  // }
+
   /**
    * Change priority of the item in a queue. This needs a reference to the object!
    * @param {*} item - item we're going to re-prioritize.

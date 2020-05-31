@@ -47,8 +47,18 @@ export interface BFSGameStateNode extends GameStateNode {
 export interface AStarConfig {
   heuristic: (state: GameStateNode) => number;
   heuristicScale: number;
-  costFunction: (state: GameStateNode) => number;
+  costFunction: (state: BFSGameStateNode) => number;
   costScale: number;
+}
+
+export type StringState = string;
+
+export interface SolutionWithStats {
+  moves: Move[];
+  nodeStats: {
+    opened: number,
+    totalUnique: number
+  };
 }
 
 export interface AStarStateNode {
@@ -56,10 +66,8 @@ export interface AStarStateNode {
   heuristic: number;
   distance: number;
   score: number;
-  closed: boolean;
-  parent: AStarStateNode | null;
   moveToHere: Move | null;
-  stringState: string;
+  stringState: StringState;
 }
 
 export interface Move {
