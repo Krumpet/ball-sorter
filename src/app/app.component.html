@@ -2,6 +2,7 @@
 <span>
     <button (click)="solve()">Solve for me!</button>
     <button (click)="showEntropy()">Calculate entropy!</button>
+    <app-solver-parameters-form></app-solver-parameters-form>
 </span>
 <app-moves class="moves" [state]="stateService.board"></app-moves>
 <div *ngIf="stateService.isGameWon">You win!</div>

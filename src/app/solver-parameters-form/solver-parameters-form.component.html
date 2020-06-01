@@ -1,0 +1,6 @@
+<p>solver-parameters-form works!</p>
+<form [formGroup]="formGroup">
+    <select formControlName="solver">
+        <option *ngFor="let option of solverTypes" [value]="option">{{option}}</option>
+    </select>
+</form>
