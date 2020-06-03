@@ -249,3 +249,7 @@ export function colorsInState(state: GameState): BallColor[] {
 export function distinct<T>(item: T, index: number, array: T[]) {
   return array.indexOf(item) === index;
 }
+
+export function isLegalMove(move: { id?: number; ball?: Ball; timer?: any; }, id: number, board: GameState): boolean {
+  return !isFull(board.vials[id]) && (isEmpty(board.vials[id]) || topBall(board.vials[id]).color === move.ball.color);
+}

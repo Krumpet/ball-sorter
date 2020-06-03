@@ -1,5 +1,5 @@
 <div *ngIf="stateService.board">
-  <div class="vial" *ngFor="let vial of stateService.board.vials">
-    <app-vial [vial]="vial"></app-vial>
+  <div class="vial" *ngFor="let vial of board.vials">
+    <app-vial [vial]="vial" (click)="doMove(vial.id-1)"></app-vial>
   </div>
 </div>
