@@ -54,7 +54,7 @@ export interface AStarConfig {
 export type StringState = string;
 
 export interface SolutionWithStats {
-  moves: Move[];
+  moves: Move[] | null;
   nodeStats: {
     opened: number,
     totalUnique: number

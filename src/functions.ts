@@ -130,7 +130,8 @@ export function createAStarNodeFromState(board: GameState,
   };
 }
 
-export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; }) {
+// TODO: Do I ever need parents or is "movesToHere" maintained?
+export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStateNode; } = {}) {
   // let curr = state;
   // const path = [curr.moveToHere];
   // while (parents[curr.stringState]) {

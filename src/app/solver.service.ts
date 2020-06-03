@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState } from '../types';
+import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats } from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
   createAStarNodeFromState, getPath, calculateEntropyForState, calculateDistanceHeuristicForState
@@ -17,6 +17,7 @@ export class SolverService {
 
   solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'AStar' = 'AStar') {
     let moves: Move[] | null = null;
+    let result: SolutionWithStats;
     switch (method) {
       case 'DFS':
         moves = this.solveRecursiveDFS(board);
@@ -25,17 +26,20 @@ export class SolverService {
         moves = this.solveRecursiveBFS(createBFSNodeFromState(board));
         break;
       case 'BFS':
-        moves = this.solveBFS(board).moves;
+        result = this.solveBFS(board);
+        moves = result.moves;
         break;
       case 'AStar':
-        moves = this.solveWithPerformance(method, this.solveAStar, board, {
+        result = this.solveWithPerformance(method, this.solveAStar, board, {
           heuristic: (a) => calculateEntropyForState(a),
           heuristicScale: 35.0,
           costFunction: (a) => a.movesToHere.length,
           costScale: 1.0
         });
+        moves = result.moves;
         break;
     }
+    console.log(`explored ${result.nodeStats.opened} states, ${result.nodeStats.totalUnique} were unique`);
     console.log(moves ? moves.map(stringifyMove) : 'no solution!');
     // this is done to check if a greedy best-first search algorithm would work, but we don't always choose the state with lowest entropy:
     // moves.map(move => move.stateBefore).forEach(state => {
@@ -111,9 +115,8 @@ export class SolverService {
     return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates);
   }
 
-  solveBFS(board: GameState): { moves: Move[] | null, nodeStats: { opened: number, totalUnique: number } } {
-    const start = 'startBFS', end = 'endBFS';
-    performance.mark(start);
+  solveBFS(board: GameState): SolutionWithStats {
+    let moves: Move[] = null;
     let exploredStatesNumber = 0;
     const exploredStates = new Set<string>([stringifyState(board)]);
     const boardStateNode = createBFSNodeFromState(board);
@@ -122,35 +125,23 @@ export class SolverService {
       exploredStatesNumber++;
       const stateToExplore = statesToExplore.shift();
       if (isGameOver(stateToExplore)) {
-        // TODO: single point of return, break from here
-        performance.mark(end);
-        performance.measure('BFS total time', start, end);
-        console.log('BFS took ' + performance.getEntriesByName('BFS total time')[0].duration + ' ms');
-        console.log(`BFS explored ${exploredStatesNumber} states`);
-
-        performance.clearMarks();
-        performance.clearMeasures();
-
-        return { moves: stateToExplore.movesToHere, nodeStats: { totalUnique: exploredStatesNumber, opened: exploredStatesNumber } };
+        moves = stateToExplore.movesToHere;
+        break;
       }
       this.updateNewStates(stateToExplore, exploredStates, statesToExplore);
     }
-    performance.mark(end);
-    performance.measure('BFS total time', start, end);
-    console.log('BFS took ' + performance.getEntriesByName('BFS total time')[0].duration + ' ms');
-    console.log(`BFS explored ${exploredStatesNumber} states and failed`);
-
-    performance.clearMarks();
-    performance.clearMeasures();
-    return null;
+    return { moves, nodeStats: { totalUnique: exploredStatesNumber, opened: exploredStatesNumber } };
   }
 
-  solveAStar(state: GameState, config: AStarConfig) {
+  // TODO: possibly modify to return moves to closest state to solution, with success flag
+  solveAStar(state: GameState, config: AStarConfig): SolutionWithStats {
 
+    let moves = null;
+    let uniqueNodes = 0, totalNodes = 0;
     const heuristics: { [k in StringState]: number } = {};
     const stateNode: AStarStateNode = createAStarNodeFromState(state, heuristics, config);
     const gScores: { [k in StringState]: number } = { [stateNode.stringState]: stateNode.distance };
-    const parents: { [k in StringState]: AStarStateNode } = { [stateNode.stringState]: null };
+    // const parents: { [k in StringState]: AStarStateNode } = { [stateNode.stringState]: null };
     const openSet = new PriorityQueue<AStarStateNode>(
       (a, b) => a.score < b.score ? -1 : a.score > b.score ? 1 : 0,
       (a, b) => a.stringState === b.stringState ? 0 : -1 // is actually only equality comparator
@@ -160,8 +151,14 @@ export class SolverService {
 
     while (openSet.size() > 0) {
       const current = openSet.poll();
+      if (!(current.stringState in heuristics)) {
+        uniqueNodes++; // seeing this state for the first time
+      }
+      totalNodes++;
       if (isGameOver(current.stateNode)) {
-        return getPath(current, parents);
+        moves = getPath(current);
+        break;
+        // return { moves: getPath(current /*, parents */), nodeStats: { opened: totalNodes, totalUnique: uniqueNodes } };
       }
 
       const possibleNextStates = current.stateNode.possibleMoves
@@ -182,7 +179,7 @@ export class SolverService {
         }
       });
     }
-    return null;
+    return { moves, nodeStats: { opened: totalNodes, totalUnique: uniqueNodes } };
   }
 
   private updateNewStates(board: BFSGameStateNode, exploredStates: Set<string>, statesToExplore: BFSGameStateNode[]) {
