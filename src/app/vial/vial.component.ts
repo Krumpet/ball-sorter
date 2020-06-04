@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core'
-import { Vial } from '../../types';
+import { Vial, BallColor } from '../../types';
 import { ballsPerVial } from '../../consts';
 
 @Component({
@@ -10,7 +10,8 @@ import { ballsPerVial } from '../../consts';
 export class VialComponent implements OnInit {
 
   @Input() vial!: Vial;
-  display!: string[];
+  display!: (BallColor | 'blank')[];
+  topBallIndex: number;
   constructor() { }
 
   ngOnInit() {
@@ -19,6 +20,7 @@ export class VialComponent implements OnInit {
       this.display.push('blank');
     }
     this.display.reverse();
+    this.topBallIndex = this.display.findIndex(color => color !== 'blank');
   }
 
 }

@@ -1,6 +1,6 @@
 <div class="vial">
-  <div *ngFor="let color of display">
-    <app-ball [color]="color"></app-ball>
+  <div *ngFor="let color of display; let f=first">
+    <app-ball [color]="color" [ngClass]="{'topBall': f}"></app-ball>
   </div>
   <span>Vial: {{ vial.id }}</span>
 </div>
