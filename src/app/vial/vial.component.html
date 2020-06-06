@@ -1,6 +1,6 @@
 <div class="vial">
-  <div *ngFor="let color of display; let f=first">
-    <app-ball [color]="color" [ngClass]="{'topBall': f}"></app-ball>
+  <div *ngFor="let color of display; let i=index">
+    <app-ball style="display: block" [color]="color" [@ballUp]="i === topBallIndex && animationTrigger$ | async"></app-ball>
   </div>
-  <span>Vial: {{ vial.id }}</span>
+  <span>Vial: {{ vial.id + 1 }}</span>
 </div>
