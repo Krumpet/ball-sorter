@@ -63,10 +63,14 @@ export class BoardStateService {
         this.animateVialSubject.next({ id, direction: 'down' }); // bring down the ball on target vial
         this.makeMove({ ...this.moveInProgress, toVial: this._board.vials[id] });
         this.moveInProgress = null;
-      } else { // move is illegal, put down the ball in the original vial and pick up the new one
+      } else { // move is illegal, put down the ball in the original vial and (maybe) pick up the new one
         this.animateVialSubject.next({ id: this.moveInProgress.fromVial.id, direction: 'down' });
-        this.moveInProgress = { stateBefore: this._board, fromVial: this._board.vials[id] };
-        this.animateVialSubject.next({ id, direction: 'up' });
+        if (id === this.moveInProgress.fromVial.id) { // putting down ball in original vial
+          this.moveInProgress = null;
+        } else { // pick up the new one
+          this.moveInProgress = { stateBefore: this._board, fromVial: this._board.vials[id] };
+          this.animateVialSubject.next({ id, direction: 'up' });
+        }
       }
     }
   }

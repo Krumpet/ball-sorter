@@ -13,17 +13,18 @@ import { BoardStateService } from '../board-state.service';
   animations: [
     trigger('ballUp', [
       state('down', style({
-        backgroundColor: 'black',
-        width: 100,
+        // backgroundColor: 'black',
+        // width: 100,
         // margin: 200
       })),
       state('up', style({
-        backgroundColor: 'red',
-        width: 200,
+        // backgroundColor: 'red',
+        // width: 100,
         // margin: 30
-      })),
-      transition('down => up', [animate('1s')]),
-      transition('up => down', [animate('0.5s')])
+        transform: 'translateY(-{{balls}}00%)'
+      }), { params: { balls: 2 } }),
+      transition('down => up', [animate('0.3s ease-in')]),
+      transition('up => down', [animate('0.3s ease-in')])
     ])
   ]
 })
@@ -31,8 +32,9 @@ export class VialComponent implements OnInit {
 
   @Input() vial!: Vial;
   display!: (BallColor | 'blank')[];
-  topBallIndex: number;
-  animationTrigger$: Observable<'up' | 'down'>;
+  upBallListenerIndex: number;
+  downBallListenerIndex: number;
+  upBallListener$: Observable<'up' | 'down'>;
   constructor(private stateService: BoardStateService) { }
 
   ngOnInit() {
@@ -41,12 +43,9 @@ export class VialComponent implements OnInit {
       this.display.push('blank');
     }
     this.display.reverse();
-    this.topBallIndex = this.display.findIndex(color => color !== 'blank');
-    if (this.topBallIndex === -1) {
-      // bottom slot needs to be set as top ball to listen for 'down' animations
-      this.topBallIndex = ballsPerVial - 1;
-    }
-    this.animationTrigger$ = this.stateService.animateVial$.pipe(
+    this.upBallListenerIndex = this.display.findIndex(color => color !== 'blank');
+    this.downBallListenerIndex = this.display.lastIndexOf('blank');
+    this.upBallListener$ = this.stateService.animateVial$.pipe(
       filter(({ id }) => id === this.vial.id),
       map(({ direction }) => direction),
       distinctUntilChanged(),

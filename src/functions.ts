@@ -79,7 +79,7 @@ export function stringifyState(state: GameState): StringState {
 
 export function stringifyMove(move: Move): string {
   return 'move ' + topBall(move.fromVial).color +
-    ' ball from vial ' + move.fromVial.id + ' to vial ' + move.toVial.id;
+    ' ball from vial ' + move.fromVial.id + 1 + ' to vial ' + move.toVial.id + 1;
 }
 
 /**
