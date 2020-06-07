@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { GameState, Move } from '../types';
-import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, isLegalMove_2 } from '../functions';
+import { GameState, Move, BallColor } from '../types';
+import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, isLegalMove_2, topBall } from '../functions';
 import { Levels } from '../levels';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { share } from 'rxjs/operators';
@@ -18,6 +18,9 @@ export class BoardStateService {
 
   private animateVialSubject = new Subject<{ id: number, direction: 'up' | 'down' }>();
   animateVial$ = this.animateVialSubject.asObservable();
+
+  private newBallSubject = new Subject<{ id: number, color: BallColor }>();
+  newBall$ = this.newBallSubject.asObservable();
 
   moveInProgress: Pick<Move, 'fromVial' | 'stateBefore'>;
 
@@ -60,7 +63,7 @@ export class BoardStateService {
       const moveIsLegal = isLegalMove_2(this.moveInProgress.fromVial, this._board.vials[id]);
       console.log('finishing move, legal: ', moveIsLegal);
       if (moveIsLegal) {
-        this.animateVialSubject.next({ id, direction: 'down' }); // bring down the ball on target vial
+        this.newBallSubject.next({ id, color: topBall(this.moveInProgress.fromVial).color });
         this.makeMove({ ...this.moveInProgress, toVial: this._board.vials[id] });
         this.moveInProgress = null;
       } else { // move is illegal, put down the ball in the original vial and (maybe) pick up the new one

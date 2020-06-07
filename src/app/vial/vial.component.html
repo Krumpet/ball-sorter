@@ -2,7 +2,7 @@
   <div *ngFor="let color of display; let i=index" class="inline">
     <div class="rectangle"></div>
     <app-ball style="display: block" [color]="color"
-      [@ballUp]="i === upBallListenerIndex && {value: upBallListener$ | async, params: {balls: i+1}}"></app-ball>
+      [@ballUp]="i === upBallListenerIndex && {value: ballListener$ | async, params: {balls: i+1}}"></app-ball>
     <div class="rectangle"></div>
   </div>
   <span>Vial: {{ vial.id + 1 }}</span>
