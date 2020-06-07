@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core'
+import { Component, OnInit, Input } from '@angular/core';
 import { Vial, BallColor } from '../../types';
 import { ballsPerVial } from '../../consts';
 import { trigger, state, style, transition, animate } from '@angular/animations';
