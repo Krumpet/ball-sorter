@@ -1,7 +1,5 @@
 <app-board></app-board>
 <span>
-    <button (click)="solve()">Solve for me!</button>
-    <button (click)="showEntropy()">Calculate entropy!</button>
+    <button (click)="solve()">Solve for me!</button>    
 </span>
-<app-moves class="moves" [state]="stateService.board"></app-moves>
 <div *ngIf="stateService.isGameWon">You win!</div>

@@ -3,13 +3,3 @@
     width: 50px;
     border-radius: 50%;
 }
-
-.rectangle {
-    height: 50px;
-    width: 7px;
-    background-color: #555;
-}
-
-.inline {
-    display: flex;
-}
