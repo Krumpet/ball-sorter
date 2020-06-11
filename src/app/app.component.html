@@ -1,5 +1,6 @@
 <app-board></app-board>
-<span>
+<div>
+    <app-solver-parameters-form></app-solver-parameters-form>
     <button (click)="solve()">Solve for me!</button>    
-</span>
+</div>
 <div *ngIf="stateService.isGameWon">You win!</div>

@@ -1,6 +1,23 @@
-<p>solver-parameters-form works!</p>
-<form [formGroup]="formGroup">
+<p>Solver Parameters</p>
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
     <select formControlName="solver">
         <option *ngFor="let option of solverTypes" [value]="option">{{option}}</option>
     </select>
+    <div *ngIf="formGroup.get('solver').value" formGroupName="parameters">
+        <div *ngIf="isHeuristicRelevant" formGroupName="h" class="heuristic-parameters">
+            <select *ngIf="isHeuristicRelevant" formControlName="heuristic">
+                <option *ngFor="let option of heuristics" [value]="option">{{option}}</option>
+            </select>
+            <input formControlName="heuristicWeight">
+        </div>
+
+        <div *ngIf="isDistanceRelevant" formGroupName="g" class="distance-parameters">
+            <select *ngIf="isDistanceRelevant" formControlName="distance">
+                <option *ngFor="let option of distances" [value]="option">{{option}}</option>
+            </select>
+            <input formControlName="distanceWeight">
+        </div>
+    </div>
+
+    <button class="button" type="submit">Solve</button>
 </form>

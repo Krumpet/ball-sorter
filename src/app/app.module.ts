@@ -23,7 +23,8 @@ import { SolverParametersFormComponent } from './solver-parameters-form/solver-p
   ],
   imports: [
     BrowserModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
