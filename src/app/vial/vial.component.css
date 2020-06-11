@@ -1,0 +1,19 @@
+/* .topBall {
+    margin-top: 70px;
+    display: flex;
+} */
+
+.vial {
+    margin-top: 70px;
+    /* display: flex; */
+}
+
+.rectangle {
+    height: 50px;
+    width: 7px;
+    background-color: #555;
+}
+
+.inline {
+    display: flex;
+}

@@ -79,7 +79,7 @@ export function stringifyState(state: GameState): StringState {
 
 export function stringifyMove(move: Move): string {
   return 'move ' + topBall(move.fromVial).color +
-    ' ball from vial ' + move.fromVial.id + ' to vial ' + move.toVial.id;
+    ' ball from vial ' + move.fromVial.id + 1 + ' to vial ' + move.toVial.id + 1;
 }
 
 /**
@@ -146,7 +146,7 @@ export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStat
 let next_id = 0;
 
 export function generateVial(list: VialDescription): Vial {
-  const id = ++next_id;
+  const id = next_id++;
   return { balls: list.map(color => ({ color, vialId: id })), id };
 }
 
@@ -248,4 +248,13 @@ export function colorsInState(state: GameState): BallColor[] {
 
 export function distinct<T>(item: T, index: number, array: T[]) {
   return array.indexOf(item) === index;
+}
+
+export function isLegalMove(move: { id?: number; ball?: Ball; timer?: any; }, id: number, board: GameState): boolean {
+  return !isFull(board.vials[id]) && (isEmpty(board.vials[id]) || topBall(board.vials[id]).color === move.ball.color);
+}
+
+export function isLegalMove_2(from: Vial, to: Vial): boolean {
+  return !isEmpty(from) && !isFull(to) &&
+    (isEmpty(to) || topBall(to).color === topBall(from).color);
 }
