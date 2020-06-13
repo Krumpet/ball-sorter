@@ -31,6 +31,7 @@ export class SolverService {
         result = this.solveBFS(board);
         moves = result.moves;
         break;
+        // TODO: solve 'greedy' differently
       default: // A-Star variants, including greedy
         result = this.solveWithPerformance(method, this.solveAStar, board, config);
         moves = result.moves;
@@ -149,10 +150,8 @@ export class SolverService {
 
     while (openSet.size() > 0) {
       const current = openSet.poll();
-      if (!(current.stringState in heuristics)) {
-        uniqueNodes++; // seeing this state for the first time
-      }
-      totalNodes++;
+      uniqueNodes++; // seeing this state for the first time
+      totalNodes++; // TODO: remove this stat
       if (isGameOver(current.stateNode)) {
         moves = getPath(current);
         break;

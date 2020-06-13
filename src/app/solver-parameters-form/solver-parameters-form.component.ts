@@ -48,7 +48,7 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       'distance': (state) => (state.movesToHere || []).length
     };
 
-  InitialSolverConfigurations: { [k in SolverParameters['solver']]: AStarConfig } = {
+  initialSolverConfigurations: { [k in SolverParameters['solver']]: AStarConfig } = {
     // = {
     'BFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
     'BFS-Recursive': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
@@ -103,18 +103,19 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       }
 
       // load default values into parameters on solver switch
-      this.formGroup.get('parameters').patchValue(this.InitialSolverConfigurations[solver]);
+      this.formGroup.get('parameters').patchValue(this.initialSolverConfigurations[solver]);
     }));
-
-    this.formGroup.valueChanges.subscribe(v => console.log(v, this.formGroup.valid));
   }
 
   ngOnDestroy(): void {
     this.subscriptionHolder.unsubscribe();
   }
 
-  onSubmit(value: SolverParameters) {
-    console.log(value);
+  onSubmit() {
+    if (!this.formGroup.valid) {
+      return;
+    }
+    const value: SolverParameters = this.formGroup.value;
     if (usesDistance(value.parameters)) {
       value.parameters.g.distanceWeight = +value.parameters.g.distanceWeight;
     }
@@ -122,17 +123,5 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       value.parameters.h.heuristicWeight = +value.parameters.h.heuristicWeight;
     }
     this.solverService.solve(value.solver, value.parameters);
-    // const aStarSolvers: SolverParameters['solver'][] = ['Greedy', 'AStar-Entropy', 'AStar-Moves'];
-    // if (aStarSolvers.includes(value.solver)) {
-
-    // }
-
-    // if (value.parameters.g) {
-    //   value.parameters.g.distanceWeight = +value.parameters.g.distanceWeight;
-    // }
-    // if (value.parameters.h) {
-    //   value.parameters.h.heuristicWeight = +value.parameters.h.heuristicWeight;
-    // }
   }
-
 }

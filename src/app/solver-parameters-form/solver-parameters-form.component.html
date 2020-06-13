@@ -1,21 +1,29 @@
 <p>Solver Parameters</p>
-<form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)">
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <select formControlName="solver">
         <option *ngFor="let option of solverTypes" [value]="option">{{option}}</option>
     </select>
     <div *ngIf="formGroup.get('solver').value" formGroupName="parameters">
         <div *ngIf="isHeuristicRelevant" formGroupName="h" class="heuristic-parameters">
+            <span>Choose heuristic function:</span>
             <select *ngIf="isHeuristicRelevant" formControlName="heuristic">
                 <option *ngFor="let option of heuristics" [ngValue]="functionMapping[option]">{{option}}</option>
             </select>
-            <input formControlName="heuristicWeight">
+            <div *ngIf="isDistanceRelevant">
+                <span>Choose the weight of the heuristic function (vs. distance function):</span>
+                <input  formControlName="heuristicWeight">
+            </div>
         </div>
 
         <div *ngIf="isDistanceRelevant" formGroupName="g" class="distance-parameters">
+            <span>Choose distance function:</span>
             <select *ngIf="isDistanceRelevant" formControlName="distance">
                 <option *ngFor="let option of distances" [ngValue]="functionMapping[option]">{{option}}</option>
             </select>
-            <input formControlName="distanceWeight">
+            <div *ngIf="isHeuristicRelevant">
+                <span>Choose the weight of the distance function (vs. heuristic function):</span>
+                <input formControlName="distanceWeight">
+            </div>
         </div>
     </div>
 
