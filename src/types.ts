@@ -44,11 +44,28 @@ export interface BFSGameStateNode extends GameStateNode {
   movesToHere: Move[];
 }
 
-export interface AStarConfig {
-  heuristic: (state: GameStateNode) => number;
-  heuristicScale: number;
-  costFunction: (state: BFSGameStateNode) => number;
-  costScale: number;
+export interface HeuristicParameters {
+  h: {
+    heuristic: (state: GameStateNode) => number;
+    heuristicWeight: number;
+  };
+}
+
+export interface DistanceParameters {
+  g: {
+    distance: (state: BFSGameStateNode) => number;
+    distanceWeight: number;
+  };
+}
+
+export type AStarConfig = HeuristicParameters | DistanceParameters | (HeuristicParameters & DistanceParameters);
+
+export function usesHeuristics(config: AStarConfig): config is HeuristicParameters {
+  return !!((config as HeuristicParameters).h);
+}
+
+export function usesDistance(config): config is DistanceParameters {
+  return !!((config as DistanceParameters).g);
 }
 
 export type StringState = string;
@@ -82,4 +99,14 @@ export interface CalculatedMove extends Move {
 
 export interface CalculatedMoveForSolver extends CalculatedMove {
   isBad: boolean;
+}
+
+export const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
+  ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
+export const heuristics: ['entropy', 'moves'] = ['entropy', 'moves'];
+export const distances: ['distance'] = ['distance'];
+
+export interface SolverParameters { // closely related to AStarConfig
+  solver: typeof solverTypesValue[number];
+  parameters: AStarConfig;
 }

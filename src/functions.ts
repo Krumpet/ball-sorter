@@ -2,7 +2,7 @@ import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
   CalculatedMoveForSolver, GameDescription, VialDescription,
-  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState
+  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState, usesHeuristics, usesDistance
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 
@@ -79,7 +79,7 @@ export function stringifyState(state: GameState): StringState {
 
 export function stringifyMove(move: Move): string {
   return 'move ' + topBall(move.fromVial).color +
-    ' ball from vial ' + move.fromVial.id + 1 + ' to vial ' + move.toVial.id + 1;
+    ' ball from vial ' + (move.fromVial.id + 1) + ' to vial ' + (move.toVial.id + 1);
 }
 
 /**
@@ -112,14 +112,18 @@ export function createAStarNodeFromState(board: GameState,
   movesToHere: Move[] = []): AStarStateNode {
   const stateNode = createBFSNodeFromState(board, movesToHere);
   const stringState = stringifyState(stateNode);
-  let heuristic = 0;
-  if (stringState in heuristics) {
-    heuristic = heuristics[stringState];
-  } else {
-    heuristic = config.heuristic(stateNode) * config.heuristicScale; // TODO: check if optional
-    heuristics[stringState] = heuristic;
+  let heuristic = 0, distance = 0;
+  if (usesHeuristics(config)) {
+    if (stringState in heuristics) {
+      heuristic = heuristics[stringState];
+    } else {
+      heuristic = config.h.heuristic(stateNode) * config.h.heuristicWeight;
+      heuristics[stringState] = heuristic;
+    }
   }
-  const distance = config.costFunction(stateNode) * config.costScale;
+  if (usesDistance(config)) {
+    distance = config.g.distance(stateNode) * config.g.distanceWeight;
+  }
   return {
     stateNode,
     heuristic,
@@ -142,16 +146,20 @@ export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStat
   return state.stateNode.movesToHere;
 }
 
-// TODO: maintain this state in a service for editing levels
-let next_id = 0;
-
+/**
+ * TODO: handle id assignment?
+ * @param list list of ball colors
+ */
 export function generateVial(list: VialDescription): Vial {
-  const id = next_id++;
-  return { balls: list.map(color => ({ color, vialId: id })), id };
+  return { balls: list.map(color => ({ color, vialId: null })), id: null };
 }
 
 export function generateBoard(params: GameDescription): GameState {
   const vials = params.map(list => generateVial(list));
+  vials.forEach((vial, index) => {
+    vial.id = index;
+    vial.balls.forEach(ball => ball.vialId = index);
+  });
   return { vials };
 }
 
@@ -250,11 +258,7 @@ export function distinct<T>(item: T, index: number, array: T[]) {
   return array.indexOf(item) === index;
 }
 
-export function isLegalMove(move: { id?: number; ball?: Ball; timer?: any; }, id: number, board: GameState): boolean {
-  return !isFull(board.vials[id]) && (isEmpty(board.vials[id]) || topBall(board.vials[id]).color === move.ball.color);
-}
-
-export function isLegalMove_2(from: Vial, to: Vial): boolean {
+export function isLegalMove(from: Vial, to: Vial): boolean {
   return !isEmpty(from) && !isFull(to) &&
     (isEmpty(to) || topBall(to).color === topBall(from).color);
 }

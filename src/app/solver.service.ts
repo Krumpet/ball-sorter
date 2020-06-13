@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats } from '../types';
+import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats, solverTypesValue } from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
-  createAStarNodeFromState, getPath, calculateEntropyForState, calculateDistanceHeuristicForState
+  createAStarNodeFromState, getPath
 } from '../functions';
 import PriorityQueue from '../assets/data structures/PriorityQueue';
+import { BoardStateService } from './board-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,10 @@ export class SolverService {
 
   moveList!: CalculatedMove[];
 
-  constructor() { }
+  constructor(private boardService: BoardStateService) { }
 
-  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'AStar' = 'AStar') {
+  solve(method: typeof solverTypesValue[number], config?: AStarConfig) {
+    const board = this.boardService.board;
     let moves: Move[] | null = null;
     let result: SolutionWithStats;
     switch (method) {
@@ -29,13 +31,9 @@ export class SolverService {
         result = this.solveBFS(board);
         moves = result.moves;
         break;
-      case 'AStar':
-        result = this.solveWithPerformance(method, this.solveAStar, board, {
-          heuristic: (a) => calculateEntropyForState(a),
-          heuristicScale: 35.0,
-          costFunction: (a) => a.movesToHere.length,
-          costScale: 1.0
-        });
+      // TODO: solve 'greedy' differently
+      default: // A-Star variants, including greedy
+        result = this.solveWithPerformance(method, this.solveAStar, board, config);
         moves = result.moves;
         break;
     }
@@ -65,6 +63,7 @@ export class SolverService {
     return result;
   }
 
+  // TODO: fix this
   solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0): Move[] | null {
     const boardStateNode = createDFSNodeFromState(board);
     if (isGameOver(boardStateNode)) {
@@ -79,13 +78,13 @@ export class SolverService {
       const candidate = possibleGoodMoves[index];
       const possibleMoveFromCandidateStateAfter = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter));
       if (possibleMoveFromCandidateStateAfter) {
-        const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
+        // const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
         // loop detected
-        console.log('loop', existingState, candidate, candidate.stateAfter);
+        // console.log('loop', existingState, candidate, candidate.stateAfter);
         candidate.isBad = true;
         continue;
       }
-      console.log('trying move ', candidate);
+      // console.log('trying move ', candidate);
       moveList.push(candidate);
       const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1);
       if (!result) {
@@ -136,6 +135,7 @@ export class SolverService {
   // TODO: possibly modify to return moves to closest state to solution, with success flag
   solveAStar(state: GameState, config: AStarConfig): SolutionWithStats {
 
+    console.log('solving a star with this config:', config);
     let moves = null;
     let uniqueNodes = 0, totalNodes = 0;
     const heuristics: { [k in StringState]: number } = {};
@@ -151,10 +151,8 @@ export class SolverService {
 
     while (openSet.size() > 0) {
       const current = openSet.poll();
-      if (!(current.stringState in heuristics)) {
-        uniqueNodes++; // seeing this state for the first time
-      }
-      totalNodes++;
+      uniqueNodes++; // seeing this state for the first time
+      totalNodes++; // TODO: remove this stat
       if (isGameOver(current.stateNode)) {
         moves = getPath(current);
         break;

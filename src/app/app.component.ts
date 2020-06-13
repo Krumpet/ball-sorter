@@ -12,14 +12,6 @@ export class AppComponent {
   /**
    *
    */
-  constructor(public stateService: BoardStateService, private solverService: SolverService) {
-  }
-
-  solve() {
-    this.solverService.solve(this.stateService.board);
-  }
-
-  showEntropy() {
-    console.log(calculateEntropyForState(this.stateService.board));
+  constructor(public stateService: BoardStateService) {
   }
 }

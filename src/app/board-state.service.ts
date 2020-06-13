@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GameState, Move, BallColor } from '../types';
-import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, isLegalMove_2, topBall } from '../functions';
+import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, topBall } from '../functions';
 import { Levels } from '../levels';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { share } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -60,8 +59,7 @@ export class BoardStateService {
       this.moveInProgress = { stateBefore: this._board, fromVial: this._board.vials[id] };
       this.animateVialSubject.next({ id, direction: 'up' });
     } else { // finish existing move, if legal
-      const moveIsLegal = isLegalMove_2(this.moveInProgress.fromVial, this._board.vials[id]);
-      console.log('finishing move, legal: ', moveIsLegal);
+      const moveIsLegal = isLegalMove(this.moveInProgress.fromVial, this._board.vials[id]);
       if (moveIsLegal) {
         this.newBallSubject.next({ id, color: topBall(this.moveInProgress.fromVial).color });
         this.makeMove({ ...this.moveInProgress, toVial: this._board.vials[id] });
