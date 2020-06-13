@@ -50,7 +50,6 @@ export class VialComponent implements OnInit {
       filter(({ id }) => id === this.vial.id),
       map(({ direction }) => direction),
       distinctUntilChanged(),
-      tap(x => console.log('emitting', x)),
       startWith('down')
     );
   }

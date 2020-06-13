@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats } from '../types';
+import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats, solverTypesValue } from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
-  createAStarNodeFromState, getPath, calculateEntropyForState, calculateDistanceHeuristicForState
+  createAStarNodeFromState, getPath
 } from '../functions';
 import PriorityQueue from '../assets/data structures/PriorityQueue';
 import { BoardStateService } from './board-state.service';
@@ -16,7 +16,7 @@ export class SolverService {
 
   constructor(private boardService: BoardStateService) { }
 
-  solve(/*board: GameState,*/ method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'Greedy' | 'AStar-Moves' | 'AStar-Entropy', config?: AStarConfig) {
+  solve(method: typeof solverTypesValue[number], config?: AStarConfig) {
     const board = this.boardService.board;
     let moves: Move[] | null = null;
     let result: SolutionWithStats;
@@ -31,7 +31,7 @@ export class SolverService {
         result = this.solveBFS(board);
         moves = result.moves;
         break;
-        // TODO: solve 'greedy' differently
+      // TODO: solve 'greedy' differently
       default: // A-Star variants, including greedy
         result = this.solveWithPerformance(method, this.solveAStar, board, config);
         moves = result.moves;
@@ -63,6 +63,7 @@ export class SolverService {
     return result;
   }
 
+  // TODO: fix this
   solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0): Move[] | null {
     const boardStateNode = createDFSNodeFromState(board);
     if (isGameOver(boardStateNode)) {
@@ -77,13 +78,13 @@ export class SolverService {
       const candidate = possibleGoodMoves[index];
       const possibleMoveFromCandidateStateAfter = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter));
       if (possibleMoveFromCandidateStateAfter) {
-        const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
+        // const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
         // loop detected
-        console.log('loop', existingState, candidate, candidate.stateAfter);
+        // console.log('loop', existingState, candidate, candidate.stateAfter);
         candidate.isBad = true;
         continue;
       }
-      console.log('trying move ', candidate);
+      // console.log('trying move ', candidate);
       moveList.push(candidate);
       const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1);
       if (!result) {

@@ -100,3 +100,13 @@ export interface CalculatedMove extends Move {
 export interface CalculatedMoveForSolver extends CalculatedMove {
   isBad: boolean;
 }
+
+export const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
+  ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
+export const heuristics: ['entropy', 'moves'] = ['entropy', 'moves'];
+export const distances: ['distance'] = ['distance'];
+
+export interface SolverParameters { // closely related to AStarConfig
+  solver: typeof solverTypesValue[number];
+  parameters: AStarConfig;
+}
