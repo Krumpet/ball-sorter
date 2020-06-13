@@ -2,7 +2,7 @@ import {
   Vial, Ball, GameState, Move,
   CalculatedMove, DFSGameStateNode,
   CalculatedMoveForSolver, GameDescription, VialDescription,
-  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState
+  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState, usesHeuristics, usesDistance
 } from './types';
 import { ballsPerColor, ballsPerVial } from './consts';
 
@@ -112,14 +112,18 @@ export function createAStarNodeFromState(board: GameState,
   movesToHere: Move[] = []): AStarStateNode {
   const stateNode = createBFSNodeFromState(board, movesToHere);
   const stringState = stringifyState(stateNode);
-  let heuristic = 0;
-  if (stringState in heuristics) {
-    heuristic = heuristics[stringState];
-  } else {
-    heuristic = config.heuristic(stateNode) * config.heuristicScale; // TODO: check if optional
-    heuristics[stringState] = heuristic;
+  let heuristic = 0, distance = 0;
+  if (usesHeuristics(config)) {
+    if (stringState in heuristics) {
+      heuristic = heuristics[stringState];
+    } else {
+      heuristic = config.h.heuristic(stateNode) * config.h.heuristicWeight;
+      heuristics[stringState] = heuristic;
+    }
   }
-  const distance = config.costFunction(stateNode) * config.costScale;
+  if (usesDistance(config)) {
+    distance = config.g.distance(stateNode) * config.g.distanceWeight;
+  }
   return {
     stateNode,
     heuristic,

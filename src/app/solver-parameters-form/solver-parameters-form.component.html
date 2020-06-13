@@ -6,14 +6,14 @@
     <div *ngIf="formGroup.get('solver').value" formGroupName="parameters">
         <div *ngIf="isHeuristicRelevant" formGroupName="h" class="heuristic-parameters">
             <select *ngIf="isHeuristicRelevant" formControlName="heuristic">
-                <option *ngFor="let option of heuristics" [value]="option">{{option}}</option>
+                <option *ngFor="let option of heuristics" [ngValue]="functionMapping[option]">{{option}}</option>
             </select>
             <input formControlName="heuristicWeight">
         </div>
 
         <div *ngIf="isDistanceRelevant" formGroupName="g" class="distance-parameters">
             <select *ngIf="isDistanceRelevant" formControlName="distance">
-                <option *ngFor="let option of distances" [value]="option">{{option}}</option>
+                <option *ngFor="let option of distances" [ngValue]="functionMapping[option]">{{option}}</option>
             </select>
             <input formControlName="distanceWeight">
         </div>

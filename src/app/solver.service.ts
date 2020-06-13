@@ -5,6 +5,7 @@ import {
   createAStarNodeFromState, getPath, calculateEntropyForState, calculateDistanceHeuristicForState
 } from '../functions';
 import PriorityQueue from '../assets/data structures/PriorityQueue';
+import { BoardStateService } from './board-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,10 @@ export class SolverService {
 
   moveList!: CalculatedMove[];
 
-  constructor() { }
+  constructor(private boardService: BoardStateService) { }
 
-  solve(board: GameState, method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'AStar' = 'AStar') {
+  solve(/*board: GameState,*/ method: 'BFS' | 'BFS-Recursive' | 'DFS' | 'Greedy' | 'AStar-Moves' | 'AStar-Entropy', config?: AStarConfig) {
+    const board = this.boardService.board;
     let moves: Move[] | null = null;
     let result: SolutionWithStats;
     switch (method) {
@@ -29,13 +31,8 @@ export class SolverService {
         result = this.solveBFS(board);
         moves = result.moves;
         break;
-      case 'AStar':
-        result = this.solveWithPerformance(method, this.solveAStar, board, {
-          heuristic: (a) => calculateEntropyForState(a),
-          heuristicScale: 35.0,
-          costFunction: (a) => a.movesToHere.length,
-          costScale: 1.0
-        });
+      default: // A-Star variants, including greedy
+        result = this.solveWithPerformance(method, this.solveAStar, board, config);
         moves = result.moves;
         break;
     }
@@ -136,6 +133,7 @@ export class SolverService {
   // TODO: possibly modify to return moves to closest state to solution, with success flag
   solveAStar(state: GameState, config: AStarConfig): SolutionWithStats {
 
+    console.log('solving a star with this config:', config);
     let moves = null;
     let uniqueNodes = 0, totalNodes = 0;
     const heuristics: { [k in StringState]: number } = {};

@@ -2,26 +2,31 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, Form, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { nonnegativeNumber } from '../../validation';
+import { AStarConfig, GameStateNode, BFSGameStateNode, usesDistance, usesHeuristics } from '../../types';
+import { calculateEntropyForState, calculateDistanceHeuristicForState } from '../../functions';
+import { SolverService } from '../solver.service';
 
-// type solverTypes = 'BFS' | 'BFS-Recursive' | 'DFS' | 'AStar';
-
-const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar', 'Greedy'] = ['BFS', 'BFS-Recursive', 'DFS', 'AStar', 'Greedy'];
+const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
+  ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
 const heuristics: ['entropy', 'moves'] = ['entropy', 'moves'];
 const distances: ['distance'] = ['distance'];
 
-interface SolverParameters {
+interface SolverParameters { // closely related to AStarConfig
   solver: typeof solverTypesValue[number];
-  parameters: {
-    h?: {
-      heuristic: typeof heuristics[number];
-      heuristicWeight: number;
-    };
-    g?: {
-      distance: typeof distances[number];
-      distanceWeight: number;
-    };
-  };
+  parameters: AStarConfig;
+  // {
+  //   h?: {
+  //     heuristic: typeof heuristics[number];
+  //     heuristicWeight: number;
+  //   };
+  //   g?: {
+  //     distance: typeof distances[number];
+  //     distanceWeight: number;
+  //   };
+  // };
 }
+
+
 
 @Component({
   selector: 'app-solver-parameters-form',
@@ -34,13 +39,37 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
   readonly heuristics = heuristics;
   readonly distances = distances;
 
+  readonly functionMapping:
+    & { [k in typeof heuristics[number]]: (state: GameStateNode) => number }
+    & { [k in typeof distances[number]]: (state: BFSGameStateNode) => number }
+    = {
+      'entropy': (state) => calculateEntropyForState(state),
+      'moves': (state) => calculateDistanceHeuristicForState(state),
+      'distance': (state) => (state.movesToHere || []).length
+    };
+
+  InitialSolverConfigurations: { [k in SolverParameters['solver']]: AStarConfig } = {
+    // = {
+    'BFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
+    'BFS-Recursive': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
+    'DFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
+    'Greedy': { h: { heuristic: this.functionMapping['moves'], heuristicWeight: 1.0 } },
+    'AStar-Moves': {
+      h: { heuristic: this.functionMapping['moves'], heuristicWeight: 1.0 },
+      g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 }
+    },
+    'AStar-Entropy': {
+      h: { heuristic: this.functionMapping['entropy'], heuristicWeight: 30.0 },
+      g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 }
+    },
+  };
   isHeuristicRelevant: boolean;
   isDistanceRelevant: boolean;
   formGroup: FormGroup;
 
   subscriptionHolder = new Subscription();
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private solverService: SolverService) { }
 
   ngOnInit(): void {
     this.formGroup = this.fb.group({
@@ -57,24 +86,24 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       })
     });
 
-    this.subscriptionHolder.add(this.formGroup.get('solver').valueChanges.subscribe((solver: typeof solverTypesValue[number]) => {
+    this.subscriptionHolder.add(this.formGroup.get('solver').valueChanges.subscribe((solver: SolverParameters['solver']) => {
       this.isHeuristicRelevant = solver !== 'BFS' && solver !== 'BFS-Recursive' && solver !== 'DFS';
-      const relevantControl = this.formGroup.get('parameters.h');
-      if (this.isHeuristicRelevant) {
-        relevantControl.enable();
-      } else {
-        relevantControl.disable();
-      }
-    }));
-
-    this.subscriptionHolder.add(this.formGroup.get('solver').valueChanges.subscribe((solver: typeof solverTypesValue[number]) => {
       this.isDistanceRelevant = solver !== 'Greedy';
-      const relevantControl = this.formGroup.get('parameters.g');
-      if (this.isDistanceRelevant) {
-        relevantControl.enable();
+      const hControl = this.formGroup.get('parameters.h');
+      if (this.isHeuristicRelevant) {
+        hControl.enable();
       } else {
-        relevantControl.disable();
+        hControl.disable();
       }
+      const gControl = this.formGroup.get('parameters.g');
+      if (this.isDistanceRelevant) {
+        gControl.enable();
+      } else {
+        gControl.disable();
+      }
+
+      // load default values into parameters on solver switch
+      this.formGroup.get('parameters').patchValue(this.InitialSolverConfigurations[solver]);
     }));
 
     this.formGroup.valueChanges.subscribe(v => console.log(v, this.formGroup.valid));
@@ -86,6 +115,24 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
 
   onSubmit(value: SolverParameters) {
     console.log(value);
+    if (usesDistance(value.parameters)) {
+      value.parameters.g.distanceWeight = +value.parameters.g.distanceWeight;
+    }
+    if (usesHeuristics(value.parameters)) {
+      value.parameters.h.heuristicWeight = +value.parameters.h.heuristicWeight;
+    }
+    this.solverService.solve(value.solver, value.parameters);
+    // const aStarSolvers: SolverParameters['solver'][] = ['Greedy', 'AStar-Entropy', 'AStar-Moves'];
+    // if (aStarSolvers.includes(value.solver)) {
+
+    // }
+
+    // if (value.parameters.g) {
+    //   value.parameters.g.distanceWeight = +value.parameters.g.distanceWeight;
+    // }
+    // if (value.parameters.h) {
+    //   value.parameters.h.heuristicWeight = +value.parameters.h.heuristicWeight;
+    // }
   }
 
 }

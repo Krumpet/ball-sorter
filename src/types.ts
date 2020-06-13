@@ -44,11 +44,28 @@ export interface BFSGameStateNode extends GameStateNode {
   movesToHere: Move[];
 }
 
-export interface AStarConfig {
-  heuristic: (state: GameStateNode) => number;
-  heuristicScale: number;
-  costFunction: (state: BFSGameStateNode) => number;
-  costScale: number;
+export interface HeuristicParameters {
+  h: {
+    heuristic: (state: GameStateNode) => number;
+    heuristicWeight: number;
+  };
+}
+
+export interface DistanceParameters {
+  g: {
+    distance: (state: BFSGameStateNode) => number;
+    distanceWeight: number;
+  };
+}
+
+export type AStarConfig = HeuristicParameters | DistanceParameters | (HeuristicParameters & DistanceParameters);
+
+export function usesHeuristics(config: AStarConfig): config is HeuristicParameters {
+  return !!((config as HeuristicParameters).h);
+}
+
+export function usesDistance(config): config is DistanceParameters {
+  return !!((config as DistanceParameters).g);
 }
 
 export type StringState = string;
