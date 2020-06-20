@@ -47,14 +47,16 @@ export default class PriorityQueue<T> extends MinHeap<T> {
 
   removeMatching(item: T, customFindingComparator = this.compareValue): PriorityQueue<T> {
     super.remove(item, customFindingComparator);
-    let entryToRemove: T;
+    let entryToRemove: T | null = null;
     for (const entry of this.priorities) {
       if (customFindingComparator.equal(entry[0], item)) {
         entryToRemove = entry[0];
         break;
       }
     }
-    this.priorities.delete(entryToRemove);
+    if (entryToRemove) {
+      this.priorities.delete(entryToRemove);
+    }
     return this;
   }
 
@@ -84,7 +86,9 @@ export default class PriorityQueue<T> extends MinHeap<T> {
 
   poll() {
     const result = super.poll();
-    this.priorities.delete(result);
+    if (result) {
+      this.priorities.delete(result);
+    }
     return result;
   }
 
@@ -112,11 +116,13 @@ export default class PriorityQueue<T> extends MinHeap<T> {
    * @param {*} b
    * @return {number}
    */
-  comparePriority(a: T, b: T): number {
-    if (this.priorities.get(a) === this.priorities.get(b)) {
+  private comparePriority(a: T, b: T): -1 | 0 | 1 {
+    // tslint:disable-next-line: no-non-null-assertion
+    const priorityA = this.priorities.get(a)!, priorityB = this.priorities.get(b)!;
+    if (priorityA === priorityB) {
       return 0;
     }
-    return this.priorities.get(a) < this.priorities.get(b) ? -1 : 1;
+    return priorityA < priorityB ? -1 : 1;
   }
 
   /**

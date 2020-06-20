@@ -102,7 +102,7 @@ export default abstract class Heap<T> {
     this.heapContainer[indexOne] = tmp;
   }
 
-  peek(): T {
+  peek(): T | null {
     if (this.heapContainer.length === 0) {
       return null;
     }
@@ -110,7 +110,7 @@ export default abstract class Heap<T> {
     return this.heapContainer[0];
   }
 
-  poll(): T {
+  poll(): T | null | undefined {
     if (this.heapContainer.length === 0) {
       return null;
     }
@@ -122,7 +122,8 @@ export default abstract class Heap<T> {
     const item = this.heapContainer[0];
 
     // Move the last element from the end to the head.
-    this.heapContainer[0] = this.heapContainer.pop();
+    // tslint:disable-next-line: no-non-null-assertion
+    this.heapContainer[0] = this.heapContainer.pop()!;
     this.heapifyDown();
 
     return item;
@@ -148,8 +149,12 @@ export default abstract class Heap<T> {
       if (indexToRemove === (this.heapContainer.length - 1)) {
         this.heapContainer.pop();
       } else {
+        if (!indexToRemove) {
+          continue;
+        }
         // Move last element in heap to the vacant (removed) position.
-        this.heapContainer[indexToRemove] = this.heapContainer.pop();
+        // tslint:disable-next-line: no-non-null-assertion
+        this.heapContainer[indexToRemove] = this.heapContainer.pop()!;
 
         // Get parent.
         const parentItem = this.parent(indexToRemove);
