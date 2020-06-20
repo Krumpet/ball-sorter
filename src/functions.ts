@@ -150,27 +150,24 @@ export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStat
  * TODO: handle id assignment?
  * @param list list of ball colors
  */
-export function generateVial(list: VialDescription): Vial {
-  return { balls: list.map(color => ({ color, vialId: null })), id: null };
+export function generateVial(list: VialDescription, index: number): Vial {
+  return { balls: list.map(color => ({ color, vialId: index })), id: index };
 }
 
 export function generateBoard(params: GameDescription): GameState {
-  const vials = params.map(list => generateVial(list));
-  vials.forEach((vial, index) => {
-    vial.id = index;
-    vial.balls.forEach(ball => ball.vialId = index);
-  });
+  const vials = params.map((list, index) => generateVial(list, index));
   return { vials };
 }
 
-export function CountArrayItemsByFunction<T extends string, U>(array: U[], splitter: (item: U) => T): Partial<{ [k in T]: number }> {
-  const returnValue: Partial<{ [k in T]: number }> = {};
+export function CountArrayItemsByFunction<T extends string, U>(array: U[], splitter: (item: U) => T):
+  Partial<Record<T, number>> {
+  const returnValue: Partial<Record<T, number>> = {};
   array.forEach(item => {
     const category = splitter(item);
     if (!returnValue[category]) {
       returnValue[category] = 1;
     } else {
-      returnValue[category]++;
+      returnValue[category]!++;
     }
   });
   return returnValue;
@@ -193,7 +190,8 @@ export function entropyOfVial(vial: Vial) {
   const ballsGroupedByColor = groupBallsByColor(vial);
   const vialEntropy = sumArray(
     Object.values(ballsGroupedByColor)
-      .map(num => {
+      .filter((num): num is number => !!num)
+      .map((num) => {
         if (num === 0) { return 0; } // probability is zero, avoid calculating 0 * -infinity
         const probability = num / ballsNumber;
         return -probability * Math.log(probability);
@@ -226,7 +224,7 @@ export function calculateDistanceHeuristicForState(state: GameState): number {
           amountOfThatColor++;
         } else { break; } // stop counting once we hit the first off-color ball
       }
-      if (!(baseColor in dictionary) || dictionary[baseColor].amount < amountOfThatColor) {
+      if (!(baseColor in dictionary) || dictionary[baseColor]!.amount < amountOfThatColor) {
         // TODO: how to handle equality in amount?
         dictionary[baseColor] = { index, amount: amountOfThatColor };
       }
@@ -238,7 +236,7 @@ export function calculateDistanceHeuristicForState(state: GameState): number {
   let result = 0;
   state.vials.filter(vial => !isEmpty(vial)).forEach((vial, index) => {
     vial.balls.forEach(ball => {
-      if (!(ball.color in baseVialMap) || baseVialMap[ball.color].index !== index) {
+      if (!(ball.color in baseVialMap) || baseVialMap[ball.color]!.index !== index) {
         result++;
       }
     });

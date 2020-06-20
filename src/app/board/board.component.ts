@@ -8,9 +8,8 @@ import { Observable } from 'rxjs';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit {
-  move: { id: number; ball: Ball; timer: any };
-  board$: Observable<GameState>;
+export class BoardComponent implements OnInit {  
+  board$!: Observable<GameState>;
   constructor(public stateService: BoardStateService) {
   }
 

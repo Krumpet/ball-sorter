@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig, AStarStateNode, StringState, SolutionWithStats, solverTypesValue } from '../types';
+import {
+  CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig,
+  AStarStateNode, StringState, SolutionWithStats, solverTypesValue, SolverParameters
+} from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
   createAStarNodeFromState, getPath
@@ -16,24 +19,26 @@ export class SolverService {
 
   constructor(private boardService: BoardStateService) { }
 
-  solve(method: typeof solverTypesValue[number], config?: AStarConfig) {
+  solve({ solver, parameters }: SolverParameters) {
     const board = this.boardService.board;
     let moves: Move[] | null = null;
     let result: SolutionWithStats;
-    switch (method) {
+    switch (solver) {
       case 'DFS':
-        moves = this.solveRecursiveDFS(board);
+        result = this.solveWithPerformance(solver, this.solveRecursiveDFS.bind(this), board);
+        moves = result.moves;
         break;
       case 'BFS-Recursive':
-        moves = this.solveRecursiveBFS(createBFSNodeFromState(board));
+        result = this.solveWithPerformance(solver, this.solveRecursiveBFS.bind(this), createBFSNodeFromState(board));
+        moves = result.moves;
         break;
       case 'BFS':
-        result = this.solveBFS(board);
+        result = this.solveWithPerformance(solver, this.solveBFS.bind(this), board);
         moves = result.moves;
         break;
       // TODO: solve 'greedy' differently
       default: // A-Star variants, including greedy
-        result = this.solveWithPerformance(method, this.solveAStar, board, config);
+        result = this.solveWithPerformance(solver, this.solveAStar.bind(this), board, parameters);
         moves = result.moves;
         break;
     }
@@ -64,14 +69,15 @@ export class SolverService {
   }
 
   // TODO: fix this
-  solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0): Move[] | null {
+  solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0, totalNodes = { count: 0 }): SolutionWithStats {
+    totalNodes.count++; // is an object so the count is updated for all recursive calls
     const boardStateNode = createDFSNodeFromState(board);
     if (isGameOver(boardStateNode)) {
-      return moveList;
+      return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
     }
     const possibleGoodMoves = boardStateNode.possibleMoves.filter(move => !move.isBad);
     if (possibleGoodMoves.length === 0) {
-      return null;
+      return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
     }
     // TODO: sort moves using heuristic
     for (let index = 0; index < possibleGoodMoves.length; index++) {
@@ -86,43 +92,46 @@ export class SolverService {
       }
       // console.log('trying move ', candidate);
       moveList.push(candidate);
-      const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1);
-      if (!result) {
+      const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1, totalNodes);
+      if (!result.moves) {
         moveList.pop();
         candidate.isBad = true;
       } else {
-        return moveList;
+        return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
       }
     }
     // got here, no solution
-    return null;
+    return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
   }
 
   solveRecursiveBFS(board: BFSGameStateNode,
     statesToExplore: BFSGameStateNode[] = [],
-    exploredStates: Set<string> = new Set()): Move[] | null {
+    exploredStates: Set<string> = new Set(),
+    totalNodes = { count: 0 }): SolutionWithStats {
+    totalNodes.count++;
     if (isGameOver(board)) {
-      return board.movesToHere;
+      return { moves: board.movesToHere, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
     }
 
     this.updateNewStates(board, exploredStates, statesToExplore);
 
     if (statesToExplore.length === 0) {
-      return null;
+      return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
     }
     const nextStateToCheck = <BFSGameStateNode>statesToExplore.shift();
-    return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates);
+    return this.solveRecursiveBFS(nextStateToCheck, statesToExplore, exploredStates, totalNodes);
   }
 
   solveBFS(board: GameState): SolutionWithStats {
-    let moves: Move[] = null;
+    let moves: Move[] | null = null;
     let exploredStatesNumber = 0;
     const exploredStates = new Set<string>([stringifyState(board)]);
     const boardStateNode = createBFSNodeFromState(board);
     const statesToExplore = [boardStateNode];
     while (statesToExplore.length) {
       exploredStatesNumber++;
-      const stateToExplore = statesToExplore.shift();
+      // tslint:disable-next-line: no-non-null-assertion
+      const stateToExplore = statesToExplore.shift()!;
       if (isGameOver(stateToExplore)) {
         moves = stateToExplore.movesToHere;
         break;
@@ -150,7 +159,8 @@ export class SolverService {
     openSet.add(stateNode, stateNode.score);
 
     while (openSet.size() > 0) {
-      const current = openSet.poll();
+      // tslint:disable-next-line: no-non-null-assertion
+      const current = openSet.poll()!;
       uniqueNodes++; // seeing this state for the first time
       totalNodes++; // TODO: remove this stat
       if (isGameOver(current.stateNode)) {

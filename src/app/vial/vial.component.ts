@@ -33,9 +33,9 @@ export class VialComponent implements OnInit {
 
   @Input() vial!: Vial;
   display!: (BallColor | 'blank')[];
-  upBallListenerIndex: number;
-  downBallListenerIndex: number;
-  ballListener$: Observable<'up' | 'down'>;
+  upBallListenerIndex!: number;
+  downBallListenerIndex!: number;
+  ballListener$!: Observable<'up' | 'down'>;
   constructor(private stateService: BoardStateService) { }
 
   ngOnInit() {

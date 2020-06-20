@@ -9,17 +9,7 @@ import {
 import { calculateEntropyForState, calculateDistanceHeuristicForState } from '../../functions';
 import { SolverService } from '../solver.service';
 
-// const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
-//   ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
-// const heuristics: ['entropy', 'moves'] = ['entropy', 'moves'];
-// const distances: ['distance'] = ['distance'];
-
-// interface SolverParameters { // closely related to AStarConfig
-//   solver: typeof solverTypesValue[number];
-//   parameters: AStarConfig;
-// }
-
-
+// tslint:disable: no-non-null-assertion
 
 @Component({
   selector: 'app-solver-parameters-form',
@@ -56,10 +46,10 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
     },
   };
 
-  isHeuristicRelevant: boolean;
-  isDistanceRelevant: boolean;
+  isHeuristicRelevant!: boolean;
+  isDistanceRelevant!: boolean;
 
-  formGroup: FormGroup;
+  formGroup!: FormGroup;
   subscriptionHolder = new Subscription();
 
   constructor(private fb: FormBuilder, private solverService: SolverService) { }
@@ -79,16 +69,16 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       })
     });
 
-    this.subscriptionHolder.add(this.formGroup.get('solver').valueChanges.subscribe((solver: SolverParameters['solver']) => {
+    this.subscriptionHolder.add(this.formGroup.get('solver')!.valueChanges.subscribe((solver: SolverParameters['solver']) => {
       this.isHeuristicRelevant = solver !== 'BFS' && solver !== 'BFS-Recursive' && solver !== 'DFS';
       this.isDistanceRelevant = solver !== 'Greedy';
-      const hControl = this.formGroup.get('parameters.h');
+      const hControl = this.formGroup.get('parameters.h')!;
       if (this.isHeuristicRelevant) {
         hControl.enable();
       } else {
         hControl.disable();
       }
-      const gControl = this.formGroup.get('parameters.g');
+      const gControl = this.formGroup.get('parameters.g')!;
       if (this.isDistanceRelevant) {
         gControl.enable();
       } else {
@@ -96,7 +86,7 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
       }
 
       // load default values into parameters on solver switch
-      this.formGroup.get('parameters').patchValue(this.initialSolverConfigurations[solver]);
+      this.formGroup.get('parameters')!.patchValue(this.initialSolverConfigurations[solver]);
     }));
   }
 
@@ -115,6 +105,6 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
     if (usesHeuristics(value.parameters)) {
       value.parameters.h.heuristicWeight = +value.parameters.h.heuristicWeight;
     }
-    this.solverService.solve(value.solver, value.parameters);
+    this.solverService.solve(value);
   }
 }

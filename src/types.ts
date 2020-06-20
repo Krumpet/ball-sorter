@@ -64,7 +64,7 @@ export function usesHeuristics(config: AStarConfig): config is HeuristicParamete
   return !!((config as HeuristicParameters).h);
 }
 
-export function usesDistance(config): config is DistanceParameters {
+export function usesDistance(config: AStarConfig): config is DistanceParameters {
   return !!((config as DistanceParameters).g);
 }
 

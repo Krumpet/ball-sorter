@@ -18,6 +18,8 @@ export function positiveNumber(c: AbstractControl): NumberValidationErrors {
     if (numberValue <= 0) {
         return { negativeOrZero: true };
     }
+
+    return null;
 }
 
 export function nonnegativeNumber(c: AbstractControl): NumberValidationErrors {
@@ -34,4 +36,6 @@ export function nonnegativeNumber(c: AbstractControl): NumberValidationErrors {
     if (numberValue < 0) {
         return { negative: true };
     }
+
+    return null;
 }

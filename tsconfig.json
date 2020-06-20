@@ -4,7 +4,8 @@
         "target": "esnext",
         "jsx": "preserve",
         "sourceMap": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "strict": true
     },
     "exclude": [
         "node_modules",

@@ -12,8 +12,8 @@ export class BoardStateService {
   boardHistory: GameState[] = [];
   _board!: GameState;
 
-  private boardSubject: BehaviorSubject<GameState>;
-  board$: Observable<GameState>;
+  private boardSubject!: BehaviorSubject<GameState>;
+  board$!: Observable<GameState>;
 
   private animateVialSubject = new Subject<{ id: number, direction: 'up' | 'down' }>();
   animateVial$ = this.animateVialSubject.asObservable();
@@ -21,7 +21,7 @@ export class BoardStateService {
   private newBallSubject = new Subject<{ id: number, color: BallColor }>();
   newBall$ = this.newBallSubject.asObservable();
 
-  moveInProgress: Pick<Move, 'fromVial' | 'stateBefore'>;
+  moveInProgress: Pick<Move, 'fromVial' | 'stateBefore'> | null = null;
 
   isGameWon = false;
   set board(newState: GameState) {

@@ -3,7 +3,7 @@
     <select formControlName="solver">
         <option *ngFor="let option of solverTypes" [value]="option">{{option}}</option>
     </select>
-    <div *ngIf="formGroup.get('solver').value" formGroupName="parameters">
+    <div *ngIf="formGroup.get('solver') && formGroup.get('solver')!.value" formGroupName="parameters">
         <div *ngIf="isHeuristicRelevant" formGroupName="h" class="heuristic-parameters">
             <span>Choose heuristic function:</span>
             <select *ngIf="isHeuristicRelevant" formControlName="heuristic">
