@@ -1,17 +1,26 @@
 import {
-  Vial, Ball, GameState, Move,
-  CalculatedMove, DFSGameStateNode,
-  CalculatedMoveForSolver, GameDescription, VialDescription,
-  BFSGameStateNode, NotEmptyVial, BallColor, AStarStateNode, AStarConfig, StringState, usesHeuristics, usesDistance
+  AStarConfig,
+  AStarStateNode,
+  Ball,
+  BallColor,
+  BFSGameStateNode,
+  CalculatedMove,
+  CalculatedMoveForSolver,
+  DFSGameStateNode,
+  GameDescription,
+  GameState,
+  Move,
+  NotEmptyVial,
+  StringState,
+  usesDistance,
+  usesHeuristics,
+  Vial,
+  VialDescription
 } from './types';
-import { ballsPerColor, ballsPerVial } from './consts';
+import {ballsPerColor, ballsPerVial} from './consts';
 
 export function topBall(vial: NotEmptyVial): Ball {
   return vial.balls[vial.balls.length - 1];
-}
-
-export function hasBalls(vial: Vial): vial is NotEmptyVial {
-  return !isEmpty(vial);
 }
 
 export function isEmpty(vial: Vial): boolean {
@@ -94,16 +103,14 @@ export function createDFSNodeFromState(board: GameState): DFSGameStateNode {
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
-  const boardStateNode: DFSGameStateNode = { ...board, possibleMoves };
-  return boardStateNode;
+  return {...board, possibleMoves};
 }
 
 export function createBFSNodeFromState(board: GameState, movesToHere: Move[] = []): BFSGameStateNode {
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
-  const boardStateNode: BFSGameStateNode = { ...board, possibleMoves, movesToHere };
-  return boardStateNode;
+  return {...board, possibleMoves, movesToHere};
 }
 
 export function createAStarNodeFromState(board: GameState,
@@ -147,8 +154,8 @@ export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStat
 }
 
 /**
- * TODO: handle id assignment?
  * @param list list of ball colors
+ * @param index the vial index to be used in balls and vial object
  */
 export function generateVial(list: VialDescription, index: number): Vial {
   return { balls: list.map(color => ({ color, vialId: index })), id: index };
@@ -188,28 +195,30 @@ export function entropyOfVial(vial: Vial) {
     return 0;
   }
   const ballsGroupedByColor = groupBallsByColor(vial);
-  const vialEntropy = sumArray(
+   // sum color entropies
+  return sumArray(
     Object.values(ballsGroupedByColor)
       .filter((num): num is number => !!num)
       .map((num) => {
-        if (num === 0) { return 0; } // probability is zero, avoid calculating 0 * -infinity
+        if (num === 0) {
+          return 0;
+        } // probability is zero, avoid calculating 0 * -infinity
         const probability = num / ballsNumber;
         return -probability * Math.log(probability);
       })
-  ); // sum color entropies
-  return vialEntropy;
+  );
 }
 
 export function calculateEntropyForState(state: GameState): number {
   const totalBalls = sumArray(
     state.vials.map(vial => vial.balls.length)
   );
-  const stateEntropy = sumArray(
+   // sum vial entropies
+  return sumArray(
     state.vials
       .filter(vial => !isEmpty(vial))
       .map(vial => vial.balls.length * entropyOfVial(vial) / totalBalls)
-  ); // sum vial entropies
-  return stateEntropy;
+  );
 }
 
 export function calculateDistanceHeuristicForState(state: GameState): number {
@@ -242,18 +251,6 @@ export function calculateDistanceHeuristicForState(state: GameState): number {
     });
   });
   return result;
-}
-
-export function colorsInVial(vial: Vial): BallColor[] {
-  return vial.balls.map(ball => ball.color).filter(distinct);
-}
-
-export function colorsInState(state: GameState): BallColor[] {
-  return ([] as BallColor[]).concat(...state.vials.map(colorsInVial)).filter(distinct);
-}
-
-export function distinct<T>(item: T, index: number, array: T[]) {
-  return array.indexOf(item) === index;
 }
 
 export function isLegalMove(from: Vial, to: Vial): boolean {

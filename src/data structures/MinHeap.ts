@@ -6,6 +6,7 @@ export default class MinHeap<T> extends Heap<T> {
    * For MinHeap the first element must be always smaller or equal.
    * For MaxHeap the first element must be always bigger or equal.
    *
+   * @template T
    * @param {T} firstElement
    * @param {T} secondElement
    * @return {boolean}

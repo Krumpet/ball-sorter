@@ -3,7 +3,7 @@ import { Vial, BallColor } from '../../types';
 import { ballsPerVial } from '../../consts';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Observable } from 'rxjs';
-import { filter, map, distinctUntilChanged, tap, startWith } from 'rxjs/operators';
+import { filter, map, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { BoardStateService } from '../board-state.service';
 
 @Component({

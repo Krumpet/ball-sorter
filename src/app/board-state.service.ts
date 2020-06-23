@@ -18,6 +18,7 @@ export class BoardStateService {
   private animateVialSubject = new Subject<{ id: number, direction: 'up' | 'down' }>();
   animateVial$ = this.animateVialSubject.asObservable();
 
+  // TODO: to be used when adding animation to the vial that's getting a new ball
   private newBallSubject = new Subject<{ id: number, color: BallColor }>();
   newBall$ = this.newBallSubject.asObservable();
 

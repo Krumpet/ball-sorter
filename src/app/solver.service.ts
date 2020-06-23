@@ -1,27 +1,24 @@
 import { Injectable } from '@angular/core';
 import {
-  CalculatedMove, GameState, Move, BFSGameStateNode, AStarConfig,
-  AStarStateNode, StringState, SolutionWithStats, solverTypesValue, SolverParameters
+  GameState, Move, BFSGameStateNode, AStarConfig,
+  AStarStateNode, StringState, SolutionWithStats, SolverParameters
 } from '../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
   createAStarNodeFromState, getPath
 } from '../functions';
-import PriorityQueue from '../assets/data structures/PriorityQueue';
+import PriorityQueue from '../data structures/PriorityQueue';
 import { BoardStateService } from './board-state.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SolverService {
-
-  moveList!: CalculatedMove[];
-
   constructor(private boardService: BoardStateService) { }
 
   solve({ solver, parameters }: SolverParameters) {
     const board = this.boardService.board;
-    let moves: Move[] | null = null;
+    let moves: Move[] | null;
     let result: SolutionWithStats;
     switch (solver) {
       case 'DFS':

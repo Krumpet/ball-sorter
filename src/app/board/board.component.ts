@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BoardStateService } from '../board-state.service';
-import { GameState, Ball } from '../../types';
+import { GameState} from '../../types';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit {  
+export class BoardComponent implements OnInit {
   board$!: Observable<GameState>;
   constructor(public stateService: BoardStateService) {
   }
