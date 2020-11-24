@@ -46,5 +46,32 @@ export const Levels: GameDescription[] = [
         ['red', 'yellow', 'yellowgreen', 'orange'],
         [],
         [],
+    ],
+    [ // originally 843
+        ['yellowgreen', 'lightskyblue', 'darkgreen', 'gray'],
+
+        ['purple', 'darkgreen', 'pink', 'red'],
+
+        ['blue', 'gray', 'saddlebrown', 'mediumspringgreen'],
+
+        ['saddlebrown', 'lightskyblue', 'yellowgreen', 'lightskyblue'],
+
+        ['orange', 'orange', 'orange', 'gray'],
+
+        ['saddlebrown', 'saddlebrown', 'yellowgreen', 'red'],
+
+        ["mediumspringgreen", "red", "yellow", "blue"],
+
+        ['gray', 'orange', 'yellow', 'red'],
+
+        ['darkgreen', "mediumspringgreen", "yellow", "purple"],
+
+        ['blue', 'yellow', 'lightskyblue', 'purple'],
+
+        ['pink', 'mediumspringgreen', 'blue', 'yellowgreen'],
+
+        ['purple', 'darkgreen', 'pink', 'pink'],
+        [],
+        [],
     ]
 ];
