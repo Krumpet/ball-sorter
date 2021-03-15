@@ -43,7 +43,7 @@ export class BoardStateService {
   possibleMoves: Move[] = [];
 
   constructor() {
-    this.board = generateBoard(Levels[5]);
+    this.board = generateBoard(Levels[6]);
   }
 
   public getPossibleMoves() {

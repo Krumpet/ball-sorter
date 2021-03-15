@@ -60,17 +60,44 @@ export const Levels: GameDescription[] = [
 
         ['saddlebrown', 'saddlebrown', 'yellowgreen', 'red'],
 
-        ["mediumspringgreen", "red", "yellow", "blue"],
+        ['mediumspringgreen', 'red', 'yellow', 'blue'],
 
         ['gray', 'orange', 'yellow', 'red'],
 
-        ['darkgreen', "mediumspringgreen", "yellow", "purple"],
+        ['darkgreen', 'mediumspringgreen', 'yellow', 'purple'],
 
         ['blue', 'yellow', 'lightskyblue', 'purple'],
 
         ['pink', 'mediumspringgreen', 'blue', 'yellowgreen'],
 
         ['purple', 'darkgreen', 'pink', 'pink'],
+        [],
+        [],
+    ],
+    [ // originally 1051
+        ['orange', 'gray', 'yellow', 'purple'],
+
+        ['mediumspringgreen', 'gray', 'lightskyblue', 'saddlebrown'],
+
+        ['gray', 'red', 'orange', 'lightskyblue'],
+
+        ['saddlebrown', 'blue', 'purple', 'saddlebrown'],
+
+        ['purple', 'yellow', 'lightskyblue', 'orange'],
+
+        ['pink', 'mediumspringgreen', 'darkgreen', 'blue'],
+
+        ['red', 'pink', 'darkgreen', 'lightskyblue'],
+
+        /* 8 */ ['blue', 'yellow', 'orange', 'yellowgreen'],
+
+        ['mediumspringgreen', 'gray', 'saddlebrown', 'yellowgreen'],
+
+        ['yellowgreen', 'mediumspringgreen', 'yellow', 'darkgreen'],
+
+        ['red', 'blue', 'pink', 'red'],
+
+        ['pink', 'darkgreen', 'yellowgreen', 'pink'],
         [],
         [],
     ]
