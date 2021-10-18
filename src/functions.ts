@@ -17,7 +17,7 @@ import {
   Vial,
   VialDescription
 } from './types';
-import {ballsPerColor, ballsPerVial} from './consts';
+import { ballsPerColor, ballsPerVial } from './consts';
 
 export function topBall(vial: NotEmptyVial): Ball {
   return vial.balls[vial.balls.length - 1];
@@ -103,14 +103,14 @@ export function createDFSNodeFromState(board: GameState): DFSGameStateNode {
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
-  return {...board, possibleMoves};
+  return { ...board, possibleMoves };
 }
 
 export function createBFSNodeFromState(board: GameState, movesToHere: Move[] = []): BFSGameStateNode {
   const possibleMoves: CalculatedMoveForSolver[] = getPossibleMoves(board)
     .map(move => calculateMove(board, move))
     .map(move => ({ ...move, isBad: false }));
-  return {...board, possibleMoves, movesToHere};
+  return { ...board, possibleMoves, movesToHere };
 }
 
 export function createAStarNodeFromState(board: GameState,
@@ -157,8 +157,8 @@ export function getPath(state: AStarStateNode, parents: { [x: string]: AStarStat
  * @param list list of ball colors
  * @param index the vial index to be used in balls and vial object
  */
-export function generateVial(list: VialDescription, index: number): Vial {
-  return { balls: list.map(color => ({ color, vialId: index })), id: index };
+export function generateVial(list: VialDescription, vialId: number): Vial {
+  return { balls: list.map(color => ({ color, vialId })), id: vialId };
 }
 
 export function generateBoard(params: GameDescription): GameState {
@@ -171,11 +171,8 @@ export function CountArrayItemsByFunction<T extends string, U>(array: U[], split
   const returnValue: Partial<Record<T, number>> = {};
   array.forEach(item => {
     const category = splitter(item);
-    if (!returnValue[category]) {
-      returnValue[category] = 1;
-    } else {
-      returnValue[category]!++;
-    }
+    const count = returnValue[category] ?? 0;
+    returnValue[category] = count + 1;
   });
   return returnValue;
 }
@@ -185,7 +182,7 @@ export function sumArray(array: number[]): number {
   return array.reduce((sum, current) => sum + current, 0);
 }
 
-export function groupBallsByColor(vial: Vial) {
+export function groupVialBallsByColor(vial: Vial) {
   return CountArrayItemsByFunction(vial.balls, (ball) => ball.color);
 }
 
@@ -194,8 +191,8 @@ export function entropyOfVial(vial: Vial) {
   if (isEmpty(vial)) {
     return 0;
   }
-  const ballsGroupedByColor = groupBallsByColor(vial);
-   // sum color entropies
+  const ballsGroupedByColor = groupVialBallsByColor(vial);
+  // sum color entropies
   return sumArray(
     Object.values(ballsGroupedByColor)
       .filter((num): num is number => !!num)
@@ -213,7 +210,7 @@ export function calculateEntropyForState(state: GameState): number {
   const totalBalls = sumArray(
     state.vials.map(vial => vial.balls.length)
   );
-   // sum vial entropies
+  // sum vial entropies
   return sumArray(
     state.vials
       .filter(vial => !isEmpty(vial))

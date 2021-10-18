@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { GameState, Move, BallColor } from '../types';
-import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, topBall } from '../functions';
+import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, topBall, CountArrayItemsByFunction } from '../functions';
 import { Levels } from '../levels';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { ballsPerColor } from '../consts';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,18 @@ export class BoardStateService {
 
   constructor() {
     this.board = generateBoard(Levels[6]);
+    const ballsByColor = this.groupBoardBallsByColor(this.board);
+    if (!this.boardIsValid(ballsByColor)) {
+      console.log('invalid board, found: ', ballsByColor);
+    }
+  }
+
+  private groupBoardBallsByColor(board: GameState) {
+    return CountArrayItemsByFunction(board.vials.map(vial => vial.balls).flat(1), ball => ball.color);
+  }
+
+  private boardIsValid(ballsByColor: Partial<Record<BallColor, number>>) {
+    return Object.values(ballsByColor).every((amount) => (amount! <= ballsPerColor && amount! >= 0))
   }
 
   public getPossibleMoves() {

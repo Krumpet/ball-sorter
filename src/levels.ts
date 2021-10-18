@@ -97,7 +97,7 @@ export const Levels: GameDescription[] = [
 
         ['red', 'blue', 'pink', 'red'],
 
-        ['pink', 'darkgreen', 'yellowgreen', 'pink'],
+        ['pink', 'darkgreen', 'yellowgreen', 'purple'],
         [],
         [],
     ]
