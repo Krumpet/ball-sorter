@@ -22,7 +22,7 @@ export interface Vial {
   id: number;
 }
 
-// tslint:disable-next-line: no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NotEmptyVial extends Vial { }
 
 export type VialDescription = BallColor[];
@@ -37,7 +37,7 @@ export interface GameStateNode extends GameState {
   possibleMoves: CalculatedMoveForSolver[];
 }
 
-// tslint:disable-next-line: no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DFSGameStateNode extends GameStateNode { }
 
 export interface BFSGameStateNode extends GameStateNode {

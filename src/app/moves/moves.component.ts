@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { GameState, Move } from '../../types';
 import { BoardStateService } from '../board-state.service';
 
@@ -7,7 +7,7 @@ import { BoardStateService } from '../board-state.service';
   templateUrl: './moves.component.html',
   styleUrls: ['./moves.component.css']
 })
-export class MovesComponent implements OnInit {
+export class MovesComponent {
   _state!: GameState;
   possibleMoves!: Move[];
   @Input() set state(v: GameState) {
@@ -15,8 +15,4 @@ export class MovesComponent implements OnInit {
     this.possibleMoves = this.stateService.getPossibleMoves();
   }
   constructor(private stateService: BoardStateService) { }
-
-  ngOnInit() {
-  }
-
 }

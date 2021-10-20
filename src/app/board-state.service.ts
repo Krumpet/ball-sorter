@@ -56,7 +56,7 @@ export class BoardStateService {
   }
 
   private boardIsValid(ballsByColor: Partial<Record<BallColor, number>>) {
-    return Object.values(ballsByColor).every((amount) => (amount! <= ballsPerColor && amount! >= 0))
+    return Object.values(ballsByColor).every((amount) => (amount! <= ballsPerColor && amount! >= 0));
   }
 
   public getPossibleMoves() {

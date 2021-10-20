@@ -122,7 +122,7 @@ export default abstract class Heap<T> {
     const item = this.heapContainer[0];
 
     // Move the last element from the end to the head.
-    // tslint:disable-next-line: no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.heapContainer[0] = this.heapContainer.pop()!;
     this.heapifyDown();
 
@@ -153,7 +153,7 @@ export default abstract class Heap<T> {
           continue;
         }
         // Move last element in heap to the vacant (removed) position.
-        // tslint:disable-next-line: no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.heapContainer[indexToRemove] = this.heapContainer.pop()!;
 
         // Get parent.
