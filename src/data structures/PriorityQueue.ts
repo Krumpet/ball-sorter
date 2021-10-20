@@ -117,7 +117,6 @@ export default class PriorityQueue<T> extends MinHeap<T> {
    * @return {number}
    */
   private comparePriority(a: T, b: T): -1 | 0 | 1 {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const priorityA = this.priorities.get(a)!, priorityB = this.priorities.get(b)!;
     if (priorityA === priorityB) {
       return 0;

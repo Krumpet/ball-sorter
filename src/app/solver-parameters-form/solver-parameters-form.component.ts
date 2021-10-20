@@ -9,8 +9,6 @@ import {
 import { calculateEntropyForState, calculateDistanceHeuristicForState } from '../../functions';
 import { SolverService } from '../solver.service';
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 @Component({
   selector: 'app-solver-parameters-form',
   templateUrl: './solver-parameters-form.component.html',

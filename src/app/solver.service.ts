@@ -127,7 +127,6 @@ export class SolverService {
     const statesToExplore = [boardStateNode];
     while (statesToExplore.length) {
       exploredStatesNumber++;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const stateToExplore = statesToExplore.shift()!;
       if (isGameOver(stateToExplore)) {
         moves = stateToExplore.movesToHere;
@@ -156,7 +155,6 @@ export class SolverService {
     openSet.add(stateNode, stateNode.score);
 
     while (openSet.size() > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const current = openSet.poll()!;
       uniqueNodes++; // seeing this state for the first time
       totalNodes++; // TODO: remove this stat
