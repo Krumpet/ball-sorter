@@ -4,12 +4,13 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { BoardComponent } from './board/board.component';
-import { MoveComponent } from './move/move.component';
-import { MovesComponent } from './moves/moves.component';
-import { VialComponent } from './vial/vial.component';
-import { BallComponent } from './ball/ball.component';
-import { SolverParametersFormComponent } from './solver-parameters-form/solver-parameters-form.component';
+import { BoardComponent } from './components/board/board.component';
+import { BallComponent } from './components/ball/ball.component';
+import { MoveComponent } from './components/move/move.component';
+import { MovesComponent } from './components/moves/moves.component';
+import { SolverParametersFormComponent } from './components/solver-parameters-form/solver-parameters-form.component';
+import { VialComponent } from './components/vial/vial.component';
+import { LevelSelectorComponent } from './components/level-selector/level-selector.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { SolverParametersFormComponent } from './solver-parameters-form/solver-p
     MovesComponent,
     VialComponent,
     BallComponent,
-    SolverParametersFormComponent
+    SolverParametersFormComponent,
+    LevelSelectorComponent
   ],
   imports: [
     BrowserModule,

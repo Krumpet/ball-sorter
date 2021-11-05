@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import {
   GameState, Move, BFSGameStateNode, AStarConfig,
   AStarStateNode, StringState, SolutionWithStats, SolverParameters
-} from '../types';
+} from '../../types';
 import {
   createBFSNodeFromState, stringifyMove, createDFSNodeFromState, isGameOver, areStatesEqual, stringifyState,
   createAStarNodeFromState, getPath
-} from '../functions';
-import PriorityQueue from '../data structures/PriorityQueue';
+} from '../../functions';
+import PriorityQueue from '../../data structures/PriorityQueue';
 import { BoardStateService } from './board-state.service';
 
 @Injectable({

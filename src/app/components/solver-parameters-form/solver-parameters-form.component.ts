@@ -1,13 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { nonnegativeNumber } from '../../validation';
-import {
-  AStarConfig,
-  GameStateNode, BFSGameStateNode, usesDistance, usesHeuristics, solverTypesValue, heuristics, distances, SolverParameters
-} from '../../types';
-import { calculateEntropyForState, calculateDistanceHeuristicForState } from '../../functions';
-import { SolverService } from '../solver.service';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { Subscription } from "rxjs";
+import { calculateEntropyForState, calculateDistanceHeuristicForState } from "../../../functions";
+import { solverTypesValue, heuristics, distances, GameStateNode, BFSGameStateNode, SolverParameters, AStarConfig, usesDistance, usesHeuristics } from "../../../types";
+import { nonnegativeNumber } from "../../../validation";
+import { SolverService } from "../../services/solver.service";
+
 
 @Component({
   selector: 'app-solver-parameters-form',

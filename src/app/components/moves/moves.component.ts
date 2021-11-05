@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { GameState, Move } from '../../types';
-import { BoardStateService } from '../board-state.service';
+import { GameState, Move } from '../../../types';
+import { BoardStateService } from '../../services/board-state.service';
 
 @Component({
   selector: 'app-moves',

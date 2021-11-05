@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { BoardStateService } from './board-state.service';
+import { BoardStateService } from './services/board-state.service';
 
 @Component({
   selector: 'app-root',
@@ -7,9 +7,7 @@ import { BoardStateService } from './board-state.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  /**
-   *
-   */
+
   constructor(public stateService: BoardStateService) {
   }
 }

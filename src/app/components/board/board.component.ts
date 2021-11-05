@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { BoardStateService } from '../board-state.service';
-import { GameState} from '../../types';
+import { GameState} from '../../../types';
 import { Observable } from 'rxjs';
+import { BoardStateService } from '../../services/board-state.service';
 
 @Component({
   selector: 'app-board',

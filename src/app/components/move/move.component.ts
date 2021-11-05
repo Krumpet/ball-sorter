@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { BoardStateService } from '../board-state.service';
-import { Move } from '../../types';
-import { stringifyMove } from '../../functions';
+import { stringifyMove } from '../../../functions';
+import { Move } from '../../../types';
+import { BoardStateService } from '../../services/board-state.service';
 
 @Component({
   selector: 'app-move',

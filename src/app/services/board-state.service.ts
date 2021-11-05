@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { GameState, Move, BallColor } from '../types';
-import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, topBall, CountArrayItemsByFunction } from '../functions';
-import { Levels } from '../levels';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
-import { ballsPerColor } from '../consts';
+import { ballsPerColor } from '../../consts';
+import { getPossibleMoves, isGameOver, generateBoard, CountArrayItemsByFunction, calculateMove, isLegalMove, topBall } from '../../functions';
+import { Levels } from '../../levels';
+import { GameState, BallColor, Move } from '../../types';
+
 
 @Injectable({
   providedIn: 'root'
