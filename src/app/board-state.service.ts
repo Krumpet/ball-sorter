@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { GameState, Move, BallColor } from '../types';
 import { getPossibleMoves, isGameOver, calculateMove, generateBoard, isLegalMove, topBall, CountArrayItemsByFunction } from '../functions';
 import { Levels } from '../levels';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { ballsPerColor } from '../consts';
 
 @Injectable({
@@ -10,11 +10,8 @@ import { ballsPerColor } from '../consts';
 })
 export class BoardStateService {
 
-  boardHistory: GameState[] = [];
-  _board!: GameState;
-
-  private boardSubject!: BehaviorSubject<GameState>;
-  board$!: Observable<GameState>;
+  private boardSubject: ReplaySubject<GameState> = new ReplaySubject(1);
+  board$: Observable<GameState> = this.boardSubject.asObservable();
 
   private animateVialSubject = new Subject<{ id: number, direction: 'up' | 'down' }>();
   animateVial$ = this.animateVialSubject.asObservable();
@@ -26,21 +23,20 @@ export class BoardStateService {
   moveInProgress: Pick<Move, 'fromVial' | 'stateBefore'> | null = null;
 
   isGameWon = false;
+
+  private _board!: GameState;
+
   set board(newState: GameState) {
     this._board = newState;
     this.possibleMoves = getPossibleMoves(this._board);
-    this.boardHistory.push(this._board); // TODO: option to reset when switching levels
     this.isGameWon = isGameOver(this._board);
-    if (!!this.boardSubject) {
-      this.boardSubject.next(this._board);
-    } else {
-      this.boardSubject = new BehaviorSubject(this._board);
-      this.board$ = this.boardSubject.asObservable();
-    }
+    this.boardSubject.next(this._board);
   }
+
   get board() {
     return this._board;
   }
+
   possibleMoves: Move[] = [];
 
   constructor() {
