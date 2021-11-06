@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "es2020",
         "target": "es2019",
         "jsx": "preserve",
         "sourceMap": true,
         "experimentalDecorators": true,
-        "strict": true
+        "strict": true,
+        "moduleResolution": "node"
     },
     "exclude": [
         "node_modules",

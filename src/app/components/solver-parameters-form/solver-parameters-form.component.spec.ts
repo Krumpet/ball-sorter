@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SolverParametersFormComponent } from './solver-parameters-form.component';
 
@@ -8,9 +9,10 @@ describe('SolverParametersFormComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SolverParametersFormComponent ]
+      imports: [ReactiveFormsModule],
+      declarations: [SolverParametersFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

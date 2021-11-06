@@ -1,10 +1,17 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
+import { BallComponent } from './components/ball/ball.component';
+import { BoardComponent } from './components/board/board.component';
+import { SolverParametersFormComponent } from './components/solver-parameters-form/solver-parameters-form.component';
+import { VialComponent } from './components/vial/vial.component';
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, NoopAnimationsModule],
       declarations: [
-        AppComponent
+        AppComponent, SolverParametersFormComponent, BoardComponent, VialComponent, BallComponent
       ],
     }).compileComponents();
   }));
@@ -12,16 +19,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
-  }));
-  it(`should have as title 'ball-sorter'`, waitForAsync(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('ball-sorter');
-  }));
-  it('should render title in a h1 tag', waitForAsync(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to ball-sorter!');
   }));
 });

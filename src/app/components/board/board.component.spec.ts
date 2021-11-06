@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { BallComponent } from '../ball/ball.component';
+import { VialComponent } from '../vial/vial.component';
 
 import { BoardComponent } from './board.component';
 
@@ -8,9 +11,10 @@ describe('BoardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ BoardComponent ]
+      imports: [NoopAnimationsModule],
+      declarations: [BoardComponent, VialComponent, BallComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -41,7 +41,7 @@ export class BoardStateService {
   possibleMoves: Move[] = [];
 
   constructor() {
-    this.board = generateBoard(Levels[6]);
+    this.board = generateBoard(Levels["1051"]);
     const ballsByColor = this.groupBoardBallsByColor(this.board);
     if (!this.boardIsValid(ballsByColor)) {
       console.log('invalid board, found: ', ballsByColor);
@@ -53,7 +53,7 @@ export class BoardStateService {
   }
 
   private boardIsValid(ballsByColor: Partial<Record<BallColor, number>>) {
-    return Object.values(ballsByColor).every((amount) => (amount! <= ballsPerColor && amount! >= 0));
+    return Object.values(ballsByColor).every((amount) => (amount <= ballsPerColor && amount >= 0));
   }
 
   public getPossibleMoves() {

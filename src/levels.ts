@@ -1,10 +1,10 @@
 import { GameDescription } from './types';
 
-export const Levels: GameDescription[] = [
-    [['red'], ['darkgreen', 'darkgreen', 'darkgreen'], ['red', 'red', 'red', 'darkgreen']],
-    [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen'], []],
-    [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen', 'yellow', 'yellow'], ['yellow', 'yellow']],
-    [ // originally 107
+export const Levels: Record<string, GameDescription> = {
+    "0": [['red'], ['darkgreen', 'darkgreen', 'darkgreen'], ['red', 'red', 'red', 'darkgreen']],
+    "1": [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen'], []],
+    "2": [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen', 'yellow', 'yellow'], ['yellow', 'yellow']],
+    "107": [ // originally 107
         ['yellow', 'blue', 'orange', 'yellow'],
         ['gray', 'pink', 'yellow', 'yellowgreen'],
         ['mediumspringgreen', 'blue', 'pink', 'blue'],
@@ -20,7 +20,7 @@ export const Levels: GameDescription[] = [
         [],
         [],
     ],
-    [ // originally 247
+    "247": [ // originally 247
         ['pink', 'orange', 'darkgreen', 'purple'],
 
         ['gray', 'purple', 'purple', 'blue'],
@@ -47,7 +47,7 @@ export const Levels: GameDescription[] = [
         [],
         [],
     ],
-    [ // originally 843
+    "843": [ // originally 843
         ['yellowgreen', 'lightskyblue', 'darkgreen', 'gray'],
 
         ['purple', 'darkgreen', 'pink', 'red'],
@@ -74,7 +74,7 @@ export const Levels: GameDescription[] = [
         [],
         [],
     ],
-    [ // originally 1051
+    "1051": [ // originally 1051
         ['orange', 'gray', 'yellow', 'purple'],
 
         ['mediumspringgreen', 'gray', 'lightskyblue', 'saddlebrown'],
@@ -101,4 +101,4 @@ export const Levels: GameDescription[] = [
         [],
         [],
     ]
-];
+};
