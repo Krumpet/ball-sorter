@@ -1,6 +1,11 @@
+import { InjectionToken } from '@angular/core';
 import { GameDescription } from './types';
 
-export const Levels: Record<string, GameDescription> = {
+export type Levels = Record<string, GameDescription>;
+
+export const LEVELS = new InjectionToken<Levels>('levels');
+
+export const levels: Levels = {
     "0": [['red'], ['darkgreen', 'darkgreen', 'darkgreen'], ['red', 'red', 'red', 'darkgreen']],
     "1": [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen'], []],
     "2": [['red', 'red', 'darkgreen'], ['darkgreen', 'red', 'red'], ['darkgreen', 'darkgreen', 'yellow', 'yellow'], ['yellow', 'yellow']],

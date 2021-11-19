@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { ballsPerColor } from '../../consts';
 import { getPossibleMoves, isGameOver, generateBoard, CountArrayItemsByFunction, calculateMove, isLegalMove, topBall } from '../../functions';
-import { Levels } from '../../levels';
+import { Levels, LEVELS } from '../../levels';
 import { GameState, BallColor, Move } from '../../types';
 
 
@@ -40,8 +40,8 @@ export class BoardStateService {
 
   possibleMoves: Move[] = [];
 
-  constructor() {
-    this.board = generateBoard(Levels["1051"]);
+  constructor(@Inject(LEVELS) levels: Levels) {
+    this.board = generateBoard(levels["1051"]);
     const ballsByColor = this.groupBoardBallsByColor(this.board);
     if (!this.boardIsValid(ballsByColor)) {
       console.log('invalid board, found: ', ballsByColor);

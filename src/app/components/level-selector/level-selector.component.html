@@ -1,1 +1,4 @@
-<p>level-selector works!</p>
+<select> 
+    <!-- todo: objectify instead of tuple the levels -->
+    <option *ngFor="let level of levelOptions">{{level[0]}}</option>
+</select>

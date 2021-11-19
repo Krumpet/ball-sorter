@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { LEVELS } from '../../../levels';
+import { GameDescription } from '../../../types';
 
 @Component({
   selector: 'app-level-selector',
@@ -6,10 +8,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./level-selector.component.css']
 })
 export class LevelSelectorComponent implements OnInit {
+  public levelOptions: [string, GameDescription][] = [];
 
-  constructor() { }
+  constructor(@Inject(LEVELS) private levels: Record<string, GameDescription>) { }
 
   ngOnInit(): void {
+    this.levelOptions = Object.entries(this.levels);
   }
 
 }

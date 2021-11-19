@@ -11,6 +11,7 @@ import { MovesComponent } from './components/moves/moves.component';
 import { SolverParametersFormComponent } from './components/solver-parameters-form/solver-parameters-form.component';
 import { VialComponent } from './components/vial/vial.component';
 import { LevelSelectorComponent } from './components/level-selector/level-selector.component';
+import { levels, LEVELS } from '../levels';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import { LevelSelectorComponent } from './components/level-selector/level-select
     ReactiveFormsModule,
     BrowserAnimationsModule
   ],
-  providers: [],
+  providers: [{ provide: LEVELS, useValue: levels }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
