@@ -12,6 +12,7 @@ import { SolverParametersFormComponent } from './components/solver-parameters-fo
 import { VialComponent } from './components/vial/vial.component';
 import { LevelSelectorComponent } from './components/level-selector/level-selector.component';
 import { levels, LEVELS } from '../levels';
+import { StoreModule } from '@ngrx/store';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { levels, LEVELS } from '../levels';
   imports: [
     BrowserModule,
     ReactiveFormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    StoreModule.forRoot({}, {})
   ],
   providers: [{ provide: LEVELS, useValue: levels }],
   bootstrap: [AppComponent]
