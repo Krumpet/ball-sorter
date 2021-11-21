@@ -21,12 +21,7 @@ describe('MoveComponent', () => {
     const vialOne: Vial = { balls: [{ color: 'blue', vialId: 0 }], id: 0 };
     const vialTwo: Vial = { balls: [{ color: 'blue', vialId: 1 }], id: 1 };
     component.move = {
-      stateBefore: {
-        vials: [
-          vialOne,
-          vialTwo
-        ]
-      }, fromVial: vialOne, toVial: vialTwo
+      fromVial: vialOne, toVial: vialTwo
     }
     fixture.detectChanges();
   });

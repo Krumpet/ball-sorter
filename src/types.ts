@@ -88,7 +88,6 @@ export interface AStarStateNode {
 }
 
 export interface Move {
-  stateBefore: GameState;
   fromVial: NotEmptyVial;
   toVial: Vial;
 }
@@ -101,8 +100,8 @@ export interface CalculatedMoveForSolver extends CalculatedMove {
   isBad: boolean;
 }
 
-export const solverTypesValue: ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
-  ['BFS', 'BFS-Recursive', 'DFS', 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
+export const solverTypesValue: ['BFS', 'BFS-Recursive', /* 'DFS', */ 'AStar-Moves', 'AStar-Entropy', 'Greedy'] =
+  ['BFS', 'BFS-Recursive', /* 'DFS', */ 'AStar-Moves', 'AStar-Entropy', 'Greedy'];
 export const heuristics: ['entropy', 'moves'] = ['entropy', 'moves'];
 export const distances: ['distance'] = ['distance'];
 

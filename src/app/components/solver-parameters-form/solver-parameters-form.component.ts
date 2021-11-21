@@ -30,7 +30,7 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
   readonly initialSolverConfigurations: { [k in SolverParameters['solver']]: AStarConfig } = {
     'BFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
     'BFS-Recursive': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
-    'DFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
+    // 'DFS': { g: { distance: this.functionMapping['distance'], distanceWeight: 1.0 } },
     'Greedy': { h: { heuristic: this.functionMapping['moves'], heuristicWeight: 1.0 } },
     'AStar-Moves': {
       h: { heuristic: this.functionMapping['moves'], heuristicWeight: 1.0 },
@@ -66,7 +66,7 @@ export class SolverParametersFormComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptionHolder.add(this.formGroup.get('solver')!.valueChanges.subscribe((solver: SolverParameters['solver']) => {
-      this.isHeuristicRelevant = solver !== 'BFS' && solver !== 'BFS-Recursive' && solver !== 'DFS';
+      this.isHeuristicRelevant = solver !== 'BFS' && solver !== 'BFS-Recursive' /* && solver !== 'DFS' */;
       this.isDistanceRelevant = solver !== 'Greedy';
       const hControl = this.formGroup.get('parameters.h')!;
       if (this.isHeuristicRelevant) {

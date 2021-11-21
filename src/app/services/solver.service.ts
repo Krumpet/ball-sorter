@@ -21,10 +21,10 @@ export class SolverService {
     let moves: Move[] | null;
     let result: SolutionWithStats;
     switch (solver) {
-      case 'DFS':
-        result = this.solveWithPerformance(solver, this.solveRecursiveDFS.bind(this), board);
-        moves = result.moves;
-        break;
+      // case 'DFS':
+      //   result = this.solveWithPerformance(solver, this.solveRecursiveDFS.bind(this), board);
+      //   moves = result.moves;
+      //   break;
       case 'BFS-Recursive':
         result = this.solveWithPerformance(solver, this.solveRecursiveBFS.bind(this), createBFSNodeFromState(board));
         moves = result.moves;
@@ -66,40 +66,40 @@ export class SolverService {
   }
 
   // TODO: fix this
-  solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0, totalNodes = { count: 0 }): SolutionWithStats {
-    totalNodes.count++; // is an object so the count is updated for all recursive calls
-    const boardStateNode = createDFSNodeFromState(board);
-    if (isGameOver(boardStateNode)) {
-      return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
-    }
-    const possibleGoodMoves = boardStateNode.possibleMoves.filter(move => !move.isBad);
-    if (possibleGoodMoves.length === 0) {
-      return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
-    }
-    // TODO: sort moves using heuristic
-    for (let index = 0; index < possibleGoodMoves.length; index++) {
-      const candidate = possibleGoodMoves[index];
-      const possibleMoveFromCandidateStateAfter = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter));
-      if (possibleMoveFromCandidateStateAfter) {
-        // const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
-        // loop detected
-        // console.log('loop', existingState, candidate, candidate.stateAfter);
-        candidate.isBad = true;
-        continue;
-      }
-      // console.log('trying move ', candidate);
-      moveList.push(candidate);
-      const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1, totalNodes);
-      if (!result.moves) {
-        moveList.pop();
-        candidate.isBad = true;
-      } else {
-        return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
-      }
-    }
-    // got here, no solution
-    return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
-  }
+  // solveRecursiveDFS(board: GameState, moveList: Move[] = [], depth = 0, totalNodes = { count: 0 }): SolutionWithStats {
+  //   totalNodes.count++; // is an object so the count is updated for all recursive calls
+  //   const boardStateNode = createDFSNodeFromState(board);
+  //   if (isGameOver(boardStateNode)) {
+  //     return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
+  //   }
+  //   const possibleGoodMoves = boardStateNode.possibleMoves.filter(move => !move.isBad);
+  //   if (possibleGoodMoves.length === 0) {
+  //     return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
+  //   }
+  //   // TODO: sort moves using heuristic
+  //   for (let index = 0; index < possibleGoodMoves.length; index++) {
+  //     const candidate = possibleGoodMoves[index];
+  //     const possibleMoveFromCandidateStateAfter = moveList.find(m => areStatesEqual(m.stateBefore, candidate.stateAfter));
+  //     if (possibleMoveFromCandidateStateAfter) {
+  //       // const existingState = possibleMoveFromCandidateStateAfter.stateBefore;
+  //       // loop detected
+  //       // console.log('loop', existingState, candidate, candidate.stateAfter);
+  //       candidate.isBad = true;
+  //       continue;
+  //     }
+  //     // console.log('trying move ', candidate);
+  //     moveList.push(candidate);
+  //     const result = this.solveRecursiveDFS(candidate.stateAfter, moveList, depth + 1, totalNodes);
+  //     if (!result.moves) {
+  //       moveList.pop();
+  //       candidate.isBad = true;
+  //     } else {
+  //       return { moves: moveList, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
+  //     }
+  //   }
+  //   // got here, no solution
+  //   return { moves: null, nodeStats: { opened: totalNodes.count, totalUnique: totalNodes.count } };
+  // }
 
   solveRecursiveBFS(board: BFSGameStateNode,
     statesToExplore: BFSGameStateNode[] = [],

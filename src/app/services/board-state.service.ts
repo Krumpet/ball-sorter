@@ -21,7 +21,7 @@ export class BoardStateService {
   private newBallSubject = new Subject<{ id: number, color: BallColor }>();
   newBall$ = this.newBallSubject.asObservable();
 
-  moveInProgress: Pick<Move, 'fromVial' | 'stateBefore'> | null = null;
+  moveInProgress: Pick<Move, 'fromVial' /*| 'stateBefore'*/> | null = null;
 
   isGameWon = false;
 
@@ -67,7 +67,7 @@ export class BoardStateService {
 
   vialClicked(id: number) {
     if (!this.moveInProgress) { // starting new move
-      this.moveInProgress = { stateBefore: this._board, fromVial: this._board.vials[id] };
+      this.moveInProgress = { /* stateBefore: this._board, */ fromVial: this._board.vials[id] };
       this.animateVialSubject.next({ id, direction: 'up' });
     } else { // finish existing move, if legal
       const moveIsLegal = isLegalMove(this.moveInProgress.fromVial, this._board.vials[id]);
@@ -80,7 +80,7 @@ export class BoardStateService {
         if (id === this.moveInProgress.fromVial.id) { // putting down ball in original vial
           this.moveInProgress = null;
         } else { // pick up the new one
-          this.moveInProgress = { stateBefore: this._board, fromVial: this._board.vials[id] };
+          this.moveInProgress = { /* stateBefore: this._board, */ fromVial: this._board.vials[id] };
           this.animateVialSubject.next({ id, direction: 'up' });
         }
       }
