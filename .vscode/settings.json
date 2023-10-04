@@ -6,5 +6,6 @@
         "mediumspringgreen",
         "saddlebrown",
         "yellowgreen"
-    ]
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }
