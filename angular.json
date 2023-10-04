@@ -135,7 +135,6 @@
       }
     }
   },
-  "defaultProject": "ball-sorter",
   "cli": {
     "analytics": "cc98c9ec-fce6-4a40-916e-bd2dc93bf19b",
     "defaultCollection": "@angular-eslint/schematics"
